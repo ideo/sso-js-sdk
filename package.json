@@ -1,18 +1,19 @@
 {
   "name": "ideo-sso-js-sdk",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Library for performing SSO in IDEO Products",
   "main": "dist/js/ideo-sso-js-sdk.js",
   "scripts": {
     "build": "webpack --env build",
     "dev": "webpack --progress --colors --watch --env dev",
+    "start": "webpack-dev-server --env dev --color",
+    "deploy": "npm run build && aws s3 sync dist s3://ideo-sso-temp/1.0/ --profile ideo-sso --acl public-read --exclude '*.html' --exclude '*.map' --exclude '.DS_Store' ",
     "test": "mocha --compilers js:babel-core/register --colors ./test/*.spec.js",
     "test:watch": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js",
     "eslint-find-option-rules": "eslint-find-rules -c .eslintrc",
     "eslint": "eslint src/index.js"
   },
   "devDependencies": {
-    "autoprefixer": "~7.1.6",
     "babel-cli": "~6.24.1",
     "babel-core": "~6.24.1",
     "babel-eslint": "~7.2.3",
@@ -34,17 +35,18 @@
     "sass-loader": "~6.0.6",
     "style-loader": "~0.19.0",
     "webpack": "~3.1.0",
+    "webpack-dev-server": "^2.9.4",
     "yargs": "~7.1.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ideo/ideo-sso-js-sdk.git"
+    "url": "https://github.com/ideo/sso-js-sdk.git"
   },
   "author": "Matt Winkler <mwinkler@ideo.com>",
   "bugs": {
-    "url": "https://github.com/ideo/ideo-sso-js-sdk/issues"
+    "url": "https://github.com/ideo/sso-js-sdk/issues"
   },
-  "homepage": "https://github.com/ideo/ideo-sso-js-sdk",
+  "homepage": "https://github.com/ideo/sso-js-sdk",
   "dependencies": {
     "@okta/okta-signin-widget": "^2.4.0",
     "uuid": "^3.1.0"
