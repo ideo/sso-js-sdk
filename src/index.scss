@@ -1,0 +1,96 @@
+@import '../node_modules/@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
+@import '../node_modules/@okta/okta-signin-widget/dist/css/okta-theme.css';
+@import url('https://fonts.googleapis.com/css?family=Lato');
+
+/* TODO: Fork and remove montesarrat */
+
+#okta-sign-in.auth-container {
+  margin: 0 auto;
+
+  &.main-container {
+    background-color: transparent;
+    box-shadow: none;
+    border: 0px solid transparent;
+    font-family: 'Lato', Arial, Helvetica, sans-serif;
+  }
+
+  .okta-sign-in-header {
+    display: none;
+  }
+
+  .okta-form-title {
+    font-size: 28px;
+  }
+
+  .auth-divider {
+    position: relative;
+    background-color: transparent;
+
+    &:after,
+    &:before {
+      display: block;
+      content: " ";
+      position: absolute;
+      top: 0;
+      width: 35%;
+      border-top: 1px solid #ccc;
+    }
+
+    &:before {
+      left: 5%;
+    }
+    &:after {
+      right: 5%;
+    }
+    .auth-divider-text {
+      background-color: transparent;
+      top: -.75em;
+      color: #ccc;
+    }
+  }
+
+  .social-auth-button.link-button {
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    border-radius: 0px;
+    border: 0px solid transparent;
+    padding-left: 40px;
+    text-align: center;
+  }
+
+  .social-auth-facebook-button {
+    background: #37599E url(../img/icons/login/facebook_logo.png) no-repeat 10px;
+  }
+
+  .social-auth-google-button {
+    background: #FF0000 url(../img/icons/login/google_logo.png) no-repeat 10px;
+  }
+
+  .o-form-button-bar {
+    .button {
+      width: 60%;
+      margin: 0 auto;
+    }
+  }
+
+  .button-primary {
+    color: black;
+    background: transparent none;
+    border: 2px solid black;
+    border-radius: 4px;
+    text-transform: uppercase;
+    &:hover, &:active, &:focus {
+      background: black;
+      color: white;
+    }
+  }
+
+  .registration-container {
+    margin-top: 0;
+    .content {
+      padding: 0;
+      text-align: center;
+    }
+  }
+}
