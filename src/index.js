@@ -14,7 +14,7 @@ class IdeoSSO {
   }
 
   get oktaBaseUrl() {
-    return this._env === 'production' ? 'https://dev-981511.oktapreview.com' : '';
+    return this._env === 'production' ? 'https://dev-744644.oktapreview.com' : '';
   }
 
   init(opts = {}) {
@@ -95,7 +95,7 @@ class IdeoSSO {
         }
         this.oktaAuth.token.getWithoutPrompt().then(data => {
           // TODO: nonce
-          window.location.href = 'https://dev-981511.oktapreview.com/oauth2/v1/authorize?client_id=' +
+          window.location.href = 'https://dev-744644.oktapreview.com/oauth2/v1/authorize?client_id=' +
             this._client + '&response_type=code&scope=openid+email&prompt=none' +
             '&redirect_uri=' + encodeURIComponent(this._redirect) +
             '&state=' + encodeURIComponent(this._state) + '&nonce=TODOn-0S6_WzA2Mj';
@@ -135,7 +135,7 @@ class IdeoSSO {
         // THIS will be fixed later
         // click: () => {
         //   console.log('TODO: Sign Up page');
-        //   // TODO: window.location.href = 'https://dev-981511.oktapreview.com/sign-up';
+        //   // TODO: window.location.href = 'https://dev-744644.oktapreview.com/sign-up';
         // }
         parseSchema: (schema, onSuccess, onFailure) => {
           console.log('parseSchema', schema, onSuccess, onFailure);
@@ -154,8 +154,8 @@ class IdeoSSO {
       clientId: this._client,
       redirectUri: this._redirect,
       idps: [
-        {type: 'FACEBOOK', id: '0oacif05bdPsEsjYh0h7'},
-        {type: 'GOOGLE', id: '0oaaix1twko0jyKik0g4'}
+        {type: 'GOOGLE', id: '0oacyjisdvanWuodH0h7'},
+        {type: 'FACEBOOK', id: '0oad2c6zwsKAF2aEy0h7'}
       ],
       idpDisplay: 'PRIMARY',
       oAuthTimeout: 300000 // 5 minutes
