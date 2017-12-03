@@ -1,6 +1,7 @@
 import OktaSignIn from '@okta/okta-signin-widget';
 import OktaAuth from '@okta/okta-auth-js/jquery';
 import uuidv4 from 'uuid/v4';
+import merge from 'lodash/merge';
 
 import 'index.scss';
 
@@ -14,13 +15,18 @@ class IdeoSSO {
   }
 
   get oktaBaseUrl() {
-    return this._env === 'production' ? 'https://dev-744644.oktapreview.com' : '';
+    return this.opts.env === 'production' ? 'https://dev-744644.oktapreview.com' : '';
   }
 
+  // Expected params:
+  //  env
+  //  client
+  //  redurect
+  //  recoveryToken
   init(opts = {}) {
-    this._env = opts.env || 'production';
-    this._client = opts.client;
-    this._redirect = opts.redirect;
+    this.opts = merge({}, {
+      env: 'production'
+    }, opts);
     this._setupStateCookie();
   }
 
@@ -96,8 +102,8 @@ class IdeoSSO {
         this.oktaAuth.token.getWithoutPrompt().then(data => {
           // TODO: nonce
           window.location.href = 'https://dev-744644.oktapreview.com/oauth2/v1/authorize?client_id=' +
-            this._client + '&response_type=code&scope=openid+email&prompt=none' +
-            '&redirect_uri=' + encodeURIComponent(this._redirect) +
+            this.opts.client + '&response_type=code&scope=openid+email&prompt=none' +
+            '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
             '&state=' + encodeURIComponent(this._state) + '&nonce=TODOn-0S6_WzA2Mj';
           return data;
         }).catch(() => {
@@ -115,8 +121,8 @@ class IdeoSSO {
   _setupOktaAuth() {
     this._oktaAuth = new OktaAuth({
       url: this.oktaBaseUrl,
-      clientId: this._client,
-      redirectUri: this._redirect,
+      clientId: this.opts.client,
+      redirectUri: this.opts.redirect,
       responseType: 'code',
       state: this._state
     });
@@ -151,8 +157,8 @@ class IdeoSSO {
         registration: true,
         rememberMe: true
       },
-      clientId: this._client,
-      redirectUri: this._redirect,
+      clientId: this.opts.client,
+      redirectUri: this.opts.redirect,
       idps: [
         {type: 'GOOGLE', id: '0oacyjisdvanWuodH0h7'},
         {type: 'FACEBOOK', id: '0oad2c6zwsKAF2aEy0h7'}
