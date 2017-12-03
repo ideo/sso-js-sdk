@@ -131,7 +131,7 @@ class IdeoSSO {
   }
 
   _setupOktaSignIn() {
-    this._oktaSignIn = new OktaSignIn({
+    const params = {
       baseUrl: this.oktaBaseUrl,
       authParams: {
         responseType: 'code',
@@ -165,7 +165,13 @@ class IdeoSSO {
       ],
       idpDisplay: 'PRIMARY',
       oAuthTimeout: 300000 // 5 minutes
-    });
+    };
+
+    if (this.opts.recoveryToken) {
+      params.recoveryToken = this.opts.recoveryToken;
+    }
+
+    this._oktaSignIn = new OktaSignIn(params);
 
     return this._oktaSignIn;
   }
