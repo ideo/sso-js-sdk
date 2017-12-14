@@ -154,6 +154,7 @@ class IdeoSSO {
         }
       },
       features: {
+        router: false,
         registration: true,
         rememberMe: true
       },
