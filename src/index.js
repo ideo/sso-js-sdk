@@ -2,6 +2,7 @@ import OktaSignIn from '@okta/okta-signin-widget';
 import OktaAuth from '@okta/okta-auth-js/jquery';
 import uuidv4 from 'uuid/v4';
 import merge from 'lodash/merge';
+import Cookies from 'js-cookie';
 
 import 'index.scss';
 
@@ -21,8 +22,9 @@ class IdeoSSO {
   // Expected params:
   //  env
   //  client
-  //  redurect
+  //  redirect
   //  recoveryToken
+
   init(opts = {}) {
     this.opts = merge({}, {
       env: 'production'
@@ -41,7 +43,8 @@ class IdeoSSO {
         // The user has started the password recovery flow, and is on the confirmation
         // screen letting them know that an email is on the way.
         if (res.status === 'FORGOT_PASSWORD_EMAIL_SENT') {
-          // Any followup action you want to take
+          // Set cookie so we know where to redirect user back to from reset password link
+          this._setCookie('ForgotPasswordUrl', window.location.href, 24);
           return;
         }
 
@@ -179,10 +182,21 @@ class IdeoSSO {
 
   _setupStateCookie() {
     this._state = uuidv4();
-    const d = new Date();
-    d.setTime(d.getTime() + (2 * 60 * 60 * 1000));
     // TODO: https only cookie
-    document.cookie = `IdeoSSO-State=${this._state};expires=${d.toUTCString()};path=/`;
+    this._setCookie('State', this._state, 2);
+  }
+
+  _setCookie(key, value, expiresInHours = 1) {
+    return Cookies.set(`IdeoSSO-${key}`, value, { expires: this._hoursFromNow(expiresInHours) });
+  }
+
+  _getCookie(key) {
+    return Cookies.get(key);
+  }
+
+  _hoursFromNow(numHours) {
+    const d = new Date();
+    return d.setTime(d.getTime() + (numHours * 60 * 60 * 1000));
   }
 }
 
