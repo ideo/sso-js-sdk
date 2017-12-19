@@ -3,7 +3,7 @@ import OktaAuth from '@okta/okta-auth-js/jquery';
 import uuidv4 from 'uuid/v4';
 import merge from 'lodash/merge';
 import Cookies from 'js-cookie';
-import ajax from 'nanoajax';
+import nanoajax from 'nanoajax';
 
 import 'index.scss';
 
@@ -220,7 +220,7 @@ class IdeoSSO {
   _saveForgotPasswordRedirect(url) {
     const saveRedirectUrl = `${this.ssoProfileSetRedirectUrl}?url=${encodeURIComponent(url)}`;
 
-    ajax({
+    nanoajax.ajax({
       url: saveRedirectUrl,
       cors: true,
       method: 'POST'
