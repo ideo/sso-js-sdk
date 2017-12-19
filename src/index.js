@@ -68,21 +68,35 @@ class IdeoSSO {
 
         // The user has successfully completed the authentication flow
         if (res.status === 'SUCCESS') {
-          // OIDC response
-
-          // If the widget is configured for OIDC with a single responseType, the
-          // response will be the token.
-          // i.e. authParams.responseType = 'id_token':
-          // console.log(res);
-          // console.log(res.claims);
-          this.oktaSignIn.tokenManager.add('my_id_token', res);
-
-          // If the widget is configured for OIDC with multiple responseTypes, the
-          // response will be an array of tokens:
-          // i.e. authParams.responseType = ['id_token', 'token']
-          // signIn.tokenManager.add('my_id_token', res[0]);
-          // signIn.tokenManager.add('my_access_token', res[1]);
+          // SESSION response
+          // res.session.setCookieAndRedirect(this.opts.redirect);
+          window.location.href = `${this.oktaBaseUrl}/oauth2/v1/authorize?client_id=${this.opts.client}` +
+            '&response_type=code' +
+            '&scope=openid+profile+email' +
+            '&prompt=none' +
+            '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
+            `&state=${this._state}` +
+            '&nonce=n-0S6_WzA2Mj' +
+            `&sessionToken=${res.session.token}`;
         }
+
+        // TODO: If we can switch back to OIDC flow...
+        // if (res.status === 'SUCCESS') {
+        //   // OIDC response
+
+        //   // If the widget is configured for OIDC with a single responseType, the
+        //   // response will be the token.
+        //   // i.e. authParams.responseType = 'id_token':
+        //   // console.log(res);
+        //   // console.log(res.claims);
+        //   this.oktaSignIn.tokenManager.add('my_id_token', res);
+
+        //   // If the widget is configured for OIDC with multiple responseTypes, the
+        //   // response will be an array of tokens:
+        //   // i.e. authParams.responseType = ['id_token', 'token']
+        //   // signIn.tokenManager.add('my_id_token', res[0]);
+        //   // signIn.tokenManager.add('my_access_token', res[1]);
+        // }
       },
       err => { // Error
         // The widget will handle most types of errors - for example, if the user
@@ -116,7 +130,7 @@ class IdeoSSO {
         this.oktaAuth.token.getWithoutPrompt().then(data => {
           // TODO: nonce
           window.location.href = 'https://dev-744644.oktapreview.com/oauth2/v1/authorize?client_id=' +
-            this.opts.client + '&response_type=code&scope=openid+email&prompt=none' +
+            this.opts.client + '&response_type=code&scope=openid+profile+email&prompt=none' +
             '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
             '&state=' + encodeURIComponent(this._state) + '&nonce=TODOn-0S6_WzA2Mj';
           return data;
@@ -151,21 +165,18 @@ class IdeoSSO {
         responseType: 'code',
         state: this._state
       },
+      authScheme: 'SESSION',
       registration: {
         // THIS will be fixed later
-        // click: () => {
-        //   console.log('TODO: Sign Up page');
-        //   // TODO: window.location.href = 'https://dev-744644.oktapreview.com/sign-up';
+        // parseSchema: (schema, onSuccess, onFailure) => {
+        //   console.log('parseSchema', schema, onSuccess, onFailure);
+        // },
+        // preSubmit: (postData, onSuccess, onFailure) => {
+        //   console.log('preSubmit', postData, onSuccess, onFailure);
+        // },
+        // postSubmit: (response, onSuccess, onFailure) => {
+        //   console.log('postSubmit', response, onSuccess, onFailure);
         // }
-        parseSchema: (schema, onSuccess, onFailure) => {
-          console.log('parseSchema', schema, onSuccess, onFailure);
-        },
-        preSubmit: (postData, onSuccess, onFailure) => {
-          console.log('preSubmit', postData, onSuccess, onFailure);
-        },
-        postSubmit: (response, onSuccess, onFailure) => {
-          console.log('postSubmit', response, onSuccess, onFailure);
-        }
       },
       features: {
         router: false,
