@@ -26,7 +26,7 @@ class IdeoSSO {
 
   // URL used to set a forgot password redirect cookie
   get ssoProfileSetRedirectUrl() {
-    return `${this.ssoProfileAppHostname}/cookies/forgot_password_redirect`;
+    return `${this.ssoProfileHostname}/cookies/forgot_password_redirect`;
   }
 
   // Expected params:
