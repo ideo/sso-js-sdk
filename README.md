@@ -10,18 +10,16 @@ Register your application by submitting your whitelisted URLs to the IDEO SSO te
 
 ## Installation
 
-> **TODO:** Move URLs to CDN / IDEO domain
-
 Place in `<head>`:
 
 ```html
-<link href="https://s3-us-west-2.amazonaws.com/ideo-sso-temp/1.0/css/ideo-sso-js-sdk.min.css" rel="stylesheet" />
+<link href="https://d3none3dlnlrde.cloudfront.net/1.0/css/ideo-sso-js-sdk.min.css" rel="stylesheet" />
 ```
 
 Place before `</body>`:
 
 ```html
-<script type="text/javascript" src="https://s3-us-west-2.amazonaws.com/ideo-sso-temp/1.0/js/ideo-sso-js-sdk.min.js"></script>
+<script type="text/javascript" src="https://d3none3dlnlrde.cloudfront.net/1.0/js/ideo-sso-js-sdk.min.js"></script>
 <script type="text/javascript">
   IdeoSSO.init({
     env: 'staging' || 'production',
@@ -33,7 +31,7 @@ Place before `</body>`:
 
 ## Usage
 
-> **TODO:** Document the typical usage & public methods of the SDK
+You'll find usage instructions in our demo app: (ideo/sso-demo-rails)[https://github.com/ideo/sso-demo-rails]
 
 
 # Developing the SDK
@@ -69,11 +67,9 @@ npm link @okta/okta-signin-widget
 
 ## Deployment
 
-> **TODO:** Move to permanent S3 Bucket w/ CloudFront
-
-
-Build & deploy to a temporary S3 bucket using temporary credentials:
+Build & deploy to the S3 environment:
 
 ```
-npm run deploy
+npm run deploy:prod
+npm run deploy:stg
 ```
