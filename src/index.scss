@@ -1,6 +1,5 @@
 @import '../node_modules/@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
 @import '../node_modules/@okta/okta-signin-widget/dist/css/okta-theme.css';
-@import url('https://fonts.googleapis.com/css?family=Lato');
 
 /* TODO: Fork and remove montesarrat */
 
@@ -11,7 +10,7 @@
     background-color: transparent;
     box-shadow: none;
     border: 0px solid transparent;
-    font-family: 'Lato', Arial, Helvetica, sans-serif;
+    font-family: 'Gotham', Arial, Helvetica, sans-serif;
   }
 
   .okta-sign-in-header {
