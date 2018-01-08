@@ -39,10 +39,56 @@ class IdeoSSO {
     this.opts = merge({}, {
       env: 'production'
     }, opts);
-    this._setupStateCookie();
+    if (!this.opts.state) {
+      this._setupStateCookie();
+    }
   }
 
-  renderSignIn(selector) {
+  signIn() {
+    window.location.href = `${this.ssoProfileHostname}/?client_id=${this.opts.client}` +
+      '&redirect=' + encodeURIComponent(this.opts.redirect) +
+      `&state=${this.opts.state}`;
+    // '&nonce=n-0S6_WzA2Mj' + // eslint-disable-line
+    // `&sessionToken=${res.session.token}`;
+  }
+
+  logout(redirect = null) {
+    return new Promise(resolve => {
+      this.oktaAuth.signOut().finally(() => {
+        if (redirect) {
+          window.location.href = redirect;
+        }
+        resolve();
+      });
+    });
+  }
+
+  _reviveSession() {
+    return new Promise((resolve, reject) => {
+      this.oktaAuth.session.get().then(res => {
+        if (res.status !== 'ACTIVE') {
+          return reject(new Error('Not logged in'));
+        }
+        this.oktaAuth.token.getWithoutPrompt().then(data => {
+          // TODO: nonce
+          window.location.href = 'https://dev-744644.oktapreview.com/oauth2/v1/authorize?client_id=' +
+            this.opts.client + '&response_type=code&scope=openid+profile+email&prompt=none' +
+            '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
+            '&state=' + encodeURIComponent(this.opts.state) + '&nonce=TODOn-0S6_WzA2Mj';
+          return data;
+        }).catch(() => {
+          this.oktaAuth.session.close();
+          return reject(new Error('Not logged in'));
+        });
+      }).catch(err => {
+        // Not logged in
+        console.info('Not logged in:', err);
+        return reject(new Error('Not logged in'));
+      });
+    });
+  }
+
+  _renderSignIn(selector) {
     this.oktaSignIn.renderEl(
       {el: selector || '#osw-container'},
       res => { // Success
@@ -66,37 +112,37 @@ class IdeoSSO {
           return;
         }
 
+        // TODO: This was necessary for the "SESSION" authScheme for self-registration
         // The user has successfully completed the authentication flow
-        if (res.status === 'SUCCESS') {
-          // SESSION response
-          // res.session.setCookieAndRedirect(this.opts.redirect);
-          window.location.href = `${this.oktaBaseUrl}/oauth2/v1/authorize?client_id=${this.opts.client}` +
-            '&response_type=code' +
-            '&scope=openid+profile+email' +
-            '&prompt=none' +
-            '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
-            `&state=${this._state}` +
-            '&nonce=n-0S6_WzA2Mj' +
-            `&sessionToken=${res.session.token}`;
-        }
-
-        // TODO: If we can switch back to OIDC flow...
         // if (res.status === 'SUCCESS') {
-        //   // OIDC response
-
-        //   // If the widget is configured for OIDC with a single responseType, the
-        //   // response will be the token.
-        //   // i.e. authParams.responseType = 'id_token':
-        //   // console.log(res);
-        //   // console.log(res.claims);
-        //   this.oktaSignIn.tokenManager.add('my_id_token', res);
-
-        //   // If the widget is configured for OIDC with multiple responseTypes, the
-        //   // response will be an array of tokens:
-        //   // i.e. authParams.responseType = ['id_token', 'token']
-        //   // signIn.tokenManager.add('my_id_token', res[0]);
-        //   // signIn.tokenManager.add('my_access_token', res[1]);
+        //   // SESSION response
+        //   // res.session.setCookieAndRedirect(this.opts.redirect);
+        //   window.location.href = `${this.oktaBaseUrl}/oauth2/v1/authorize?client_id=${this.opts.client}` +
+        //     '&response_type=code' +
+        //     '&scope=openid+profile+email' +
+        //     '&prompt=none' +
+        //     '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
+        //     `&state=${this.opts.state}` +
+        //     '&nonce=n-0S6_WzA2Mj' +
+        //     `&sessionToken=${res.session.token}`;
         // }
+
+        if (res.status === 'SUCCESS') {
+          // OIDC response
+
+          // If the widget is configured for OIDC with a single responseType, the
+          // response will be the token.
+          // i.e. authParams.responseType = 'id_token':
+          // console.log(res);
+          // console.log(res.claims);
+          this.oktaSignIn.tokenManager.add('my_id_token', res);
+
+          // If the widget is configured for OIDC with multiple responseTypes, the
+          // response will be an array of tokens:
+          // i.e. authParams.responseType = ['id_token', 'token']
+          // signIn.tokenManager.add('my_id_token', res[0]);
+          // signIn.tokenManager.add('my_access_token', res[1]);
+        }
       },
       err => { // Error
         // The widget will handle most types of errors - for example, if the user
@@ -110,49 +156,13 @@ class IdeoSSO {
     );
   }
 
-  logout(redirect = null) {
-    return new Promise(resolve => {
-      this.oktaAuth.signOut().finally(() => {
-        if (redirect) {
-          window.location.href = redirect;
-        }
-        resolve();
-      });
-    });
-  }
-
-  reviveSession() {
-    return new Promise((resolve, reject) => {
-      this.oktaAuth.session.get().then(res => {
-        if (res.status !== 'ACTIVE') {
-          return reject(new Error('Not logged in'));
-        }
-        this.oktaAuth.token.getWithoutPrompt().then(data => {
-          // TODO: nonce
-          window.location.href = 'https://dev-744644.oktapreview.com/oauth2/v1/authorize?client_id=' +
-            this.opts.client + '&response_type=code&scope=openid+profile+email&prompt=none' +
-            '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
-            '&state=' + encodeURIComponent(this._state) + '&nonce=TODOn-0S6_WzA2Mj';
-          return data;
-        }).catch(() => {
-          this.oktaAuth.session.close();
-          return reject(new Error('Not logged in'));
-        });
-      }).catch(err => {
-        // Not logged in
-        console.info('Not logged in:', err);
-        return reject(new Error('Not logged in'));
-      });
-    });
-  }
-
   _setupOktaAuth() {
     this._oktaAuth = new OktaAuth({
       url: this.oktaBaseUrl,
       clientId: this.opts.client,
       redirectUri: this.opts.redirect,
       responseType: 'code',
-      state: this._state
+      state: this.opts.state
     });
 
     return this._oktaAuth;
@@ -163,9 +173,8 @@ class IdeoSSO {
       baseUrl: this.oktaBaseUrl,
       authParams: {
         responseType: 'code',
-        state: this._state
+        state: this.opts.state
       },
-      authScheme: 'SESSION',
       registration: {
         // THIS will be fixed later
         // parseSchema: (schema, onSuccess, onFailure) => {
@@ -203,9 +212,9 @@ class IdeoSSO {
   }
 
   _setupStateCookie() {
-    this._state = uuidv4();
+    this.opts.state = uuidv4();
     // TODO: https only cookie
-    this._setCookie('State', this._state, 2);
+    this._setCookie('State', this.opts.state, 2);
   }
 
   _setCookie(key, value, expiresInHours = 1, domain = null) {
