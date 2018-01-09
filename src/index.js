@@ -63,6 +63,10 @@ class IdeoSSO {
     });
   }
 
+  getSettingsUrl() {
+    return `${this.ssoProfileHostname}/profile`;
+  }
+
   _reviveSession() {
     return new Promise((resolve, reject) => {
       this.oktaAuth.session.get().then(res => {
