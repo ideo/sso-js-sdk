@@ -46,7 +46,7 @@ class IdeoSSO {
 
   signIn() {
     window.location.href = `${this.ssoProfileHostname}/?client_id=${this.opts.client}` +
-      '&redirect=' + encodeURIComponent(this.opts.redirect) +
+      '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
       `&state=${this.opts.state}`;
     // '&nonce=n-0S6_WzA2Mj' + // eslint-disable-line
     // `&sessionToken=${res.session.token}`;
@@ -70,11 +70,11 @@ class IdeoSSO {
           return reject(new Error('Not logged in'));
         }
         this.oktaAuth.token.getWithoutPrompt().then(data => {
-          // TODO: nonce
           window.location.href = 'https://dev-744644.oktapreview.com/oauth2/v1/authorize?client_id=' +
             this.opts.client + '&response_type=code&scope=openid+profile+email&prompt=none' +
             '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
-            '&state=' + encodeURIComponent(this.opts.state) + '&nonce=TODOn-0S6_WzA2Mj';
+            '&state=' + encodeURIComponent(this.opts.state);
+          // TODO: nonce + '&nonce=TODOn-0S6_WzA2Mj';
           return data;
         }).catch(() => {
           this.oktaAuth.session.close();
