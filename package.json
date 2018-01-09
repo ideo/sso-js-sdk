@@ -7,7 +7,7 @@
     "build": "webpack --env build",
     "dev": "webpack --progress --colors --watch --env dev",
     "start": "webpack-dev-server --env dev --color",
-    "deploy:prod": "npm run build && aws s3 sync dist s3://ideo-sso/1.0/ --profile ideo-sso --acl public-read --exclude '*.html' --exclude '*.map' --exclude '.DS_Store'",
+    "deploy:prod": "npm run build && aws s3 sync dist s3://ideo-sso/1.0/ --profile ideo-sso --acl public-read --exclude '*.html' --exclude '*.map' --exclude '.DS_Store' && aws cloudfront create-invalidation --distribution-id E3P1EIEE9327TY --invalidation-batch \"Paths={Quantity=1,Items=[/*]},CallerReference=$(date +%s)\" --profile ideo-sso",
     "deploy:staging": "npm run build && aws s3 sync dist s3://ideo-sso-staging/1.0/ --profile ideo-sso --acl public-read --exclude '*.html' --exclude '*.map' --exclude '.DS_Store'",
     "test": "mocha --compilers js:babel-core/register --colors ./test/*.spec.js",
     "test:watch": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js",
