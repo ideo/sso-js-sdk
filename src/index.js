@@ -45,7 +45,7 @@ class IdeoSSO {
   }
 
   signIn() {
-    window.location.href = `${this.ssoProfileHostname}/?client_id=${this.opts.client}` +
+    window.location.href = `${this.ssoProfileHostname}/oauth?client_id=${this.opts.client}` +
       '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
       `&state=${this.opts.state}`;
     // '&nonce=n-0S6_WzA2Mj' + // eslint-disable-line
