@@ -29,6 +29,10 @@ class IdeoSSO {
     return `${this.ssoProfileHostname}/cookies/forgot_password_redirect`;
   }
 
+  get ssoProfileLogoutUrl() {
+    return `${this.ssoProfileHostname}/sign_out`;
+  }
+
   // Expected params:
   //  env
   //  client
@@ -54,11 +58,20 @@ class IdeoSSO {
 
   logout(redirect = null) {
     return new Promise(resolve => {
+      // Logout OKTA JS
       this.oktaAuth.signOut().finally(() => {
-        if (redirect) {
-          window.location.href = redirect;
-        }
-        resolve();
+        // Logout SSO Profile app
+        nanoajax.ajax({
+          url: this.ssoProfileLogoutUrl,
+          cors: true,
+          withCredentials: true,
+          method: 'GET'
+        }, () => {
+          if (redirect) {
+            window.location.href = redirect;
+          }
+          resolve();
+        });
       });
     });
   }
