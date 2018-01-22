@@ -190,7 +190,8 @@ class IdeoSSO {
       baseUrl: this.oktaBaseUrl,
       authParams: {
         responseType: 'code',
-        state: this.opts.state
+        state: this.opts.state,
+        scopes: ['openid', 'email', 'profile']
       },
       registration: {
         // THIS will be fixed later
