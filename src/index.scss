@@ -1,7 +1,16 @@
 @import '../node_modules/@okta/okta-signin-widget/dist/css/okta-sign-in.min.css';
 @import '../node_modules/@okta/okta-signin-widget/dist/css/okta-theme.css';
 
-/* TODO: Fork and remove montesarrat */
+
+@mixin gotham {
+  font-family: 'Gotham', Arial, Helvetica, sans-serif;
+  font-weight: 400;
+}
+
+@mixin gotham-light {
+  font-family: 'Gotham', Arial, Helvetica, sans-serif;
+  font-weight: 100;
+}
 
 #okta-sign-in.auth-container {
   margin: 0 auto;
@@ -10,7 +19,7 @@
     background-color: transparent;
     box-shadow: none;
     border: 0px solid transparent;
-    font-family: 'Gotham', Arial, Helvetica, sans-serif;
+    @include gotham-light;
   }
 
   .okta-sign-in-header {
@@ -18,7 +27,9 @@
   }
 
   .okta-form-title {
-    font-size: 28px;
+    font-size: 18px;
+    @include gotham;
+    text-transform: uppercase;
   }
 
   .auth-divider {
@@ -96,4 +107,37 @@
       text-align: center;
     }
   }
+
+  .okta-form-input-field {
+    background-color: #f7f7f7;
+    border: 0px solid transparent;
+
+    input {
+      @include gotham-light;
+    }
+  }
+
+  .auth-footer {
+    text-align: center;
+  }
+
+  .link,
+  .registration-link {
+    color: #009fe3;
+  }
+
+  /*
+  /* Page Specific
+  **/
+
+  .primary-auth {
+    .okta-form-title {
+      display: none;
+    }
+  }
+
+  .forgot-password {
+    padding: 100px 0;
+  }
+
 }

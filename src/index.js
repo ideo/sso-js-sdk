@@ -213,8 +213,8 @@ class IdeoSSO {
       clientId: this.opts.client,
       redirectUri: this.opts.redirect,
       idps: [
-        {type: 'GOOGLE', id: '0oacyjisdvanWuodH0h7'},
-        {type: 'FACEBOOK', id: '0oad2c6zwsKAF2aEy0h7'}
+        {type: 'FACEBOOK', id: '0oad2c6zwsKAF2aEy0h7'},
+        {type: 'GOOGLE', id: '0oacyjisdvanWuodH0h7'}
       ],
       idpDisplay: 'PRIMARY',
       oAuthTimeout: 300000 // 5 minutes
