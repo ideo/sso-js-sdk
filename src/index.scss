@@ -30,6 +30,7 @@
     font-size: 18px;
     @include gotham;
     text-transform: uppercase;
+    color: black;
   }
 
   .auth-divider {
@@ -105,6 +106,7 @@
     .content {
       padding: 0;
       text-align: center;
+      border-top: 0px solid transparent;
     }
   }
 
@@ -122,6 +124,7 @@
   }
 
   .link,
+  .link:link,
   .registration-link {
     color: #009fe3;
   }
