@@ -82,10 +82,27 @@
     background: #04659A url(../img/icons/login/linkedin_logo.png) no-repeat 10px;
   }
 
-  .o-form-button-bar {
-    .button {
-      width: 60%;
-      margin: 0 auto;
+  .o-form {
+    .o-form-input {
+      .input-icon+input {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+      .input-icon {
+        display: none;
+      }
+      .input-tooltip {
+        display: none;
+      }
+    }
+  }
+
+  .auth-footer {
+    .link.help {
+      display: none;
+    }
+    .help-links {
+      display: block !important;
     }
   }
 
@@ -139,6 +156,7 @@
     }
   }
 
+  .password-reset-email-sent,
   .forgot-password {
     padding: 100px 0;
   }
