@@ -118,6 +118,13 @@
     }
   }
 
+  input[type=button],
+  input[type=submit] {
+    @include gotham-light;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+
   .registration-container {
     margin-top: 0;
     .content {
@@ -138,6 +145,7 @@
 
   .auth-footer {
     text-align: center;
+    font-size: 13px;
   }
 
   .link,
