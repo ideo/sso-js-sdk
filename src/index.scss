@@ -35,24 +35,8 @@
 
   .auth-divider {
     position: relative;
-    background-color: transparent;
+    background-color: transparent !important;
 
-    &:after,
-    &:before {
-      display: block;
-      content: " ";
-      position: absolute;
-      top: 0;
-      width: 35%;
-      border-top: 1px solid #ccc;
-    }
-
-    &:before {
-      left: 5%;
-    }
-    &:after {
-      right: 5%;
-    }
     .auth-divider-text {
       background-color: transparent;
       top: -.75em;
@@ -85,8 +69,8 @@
   .o-form {
     .o-form-input {
       .input-icon+input {
-        padding-left: 15px;
-        padding-right: 15px;
+        padding-left: 0px;
+        padding-right: 0px;
       }
       .input-icon {
         display: none;
@@ -106,21 +90,24 @@
     }
   }
 
-  .button-primary {
-    color: black;
-    background: transparent none;
-    border: 2px solid black;
-    border-radius: 4px;
-    text-transform: uppercase;
-    &:hover, &:active, &:focus {
-      background: black;
-      color: white;
+  .button.button-primary {
+    &, &.link-button-disabled {
+      color: black;
+      background: #eed950 none;
+      border: 0px solid transparent;
+      border-radius: 4px;
+      text-transform: uppercase;
+      &:hover, &:active, &:focus {
+        text-decoration: underline;
+        background: #eed950 none;
+        color: black;
+      }
     }
   }
 
   input[type=button],
   input[type=submit] {
-    @include gotham-light;
+    @include gotham;
     font-size: 14px;
     letter-spacing: 0.5px;
   }
@@ -135,8 +122,10 @@
   }
 
   .okta-form-input-field {
-    background-color: #f7f7f7;
+    background-color: #fff;
     border: 0px solid transparent;
+    border-bottom: 1px solid #404040;
+    border-radius: 0;
 
     input {
       @include gotham-light;
