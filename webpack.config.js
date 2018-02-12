@@ -32,7 +32,9 @@ const config = {
         enforce: 'pre',
         test: /\.(js|jsx)$/,
         loader: 'eslint-loader',
-        exclude: /node_modules/
+        include: [
+          path.resolve(__dirname, 'src')
+        ]
       },
       {
         test: /\.(js)$/,
