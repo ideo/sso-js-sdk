@@ -204,7 +204,8 @@ class IdeoSSO {
         scopes: ['openid', 'email', 'profile']
       },
       features: {
-        router: true,
+        // TODO: There is a bug when router is turned on that the forgot password sucess page redirects immediately to ""
+        router: false,
         registration: true,
         rememberMe: true
       },
