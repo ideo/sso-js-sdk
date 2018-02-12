@@ -256,12 +256,7 @@ class IdeoSSO {
 
   _saveForgotPasswordRedirect(url) {
     const saveRedirectUrl = `${this.ssoProfileSetRedirectUrl}?url=${encodeURIComponent(url)}`;
-
-    nanoajax.ajax({
-      url: saveRedirectUrl,
-      cors: true,
-      method: 'POST'
-    });
+    $.post(saveRedirectUrl);
   }
 
   _hoursFromNow(numHours) {
