@@ -3,9 +3,12 @@ import OktaAuth from '@okta/okta-auth-js/jquery';
 import uuidv4 from 'uuid/v4';
 import merge from 'lodash/merge';
 import Cookies from 'js-cookie';
-import nanoajax from 'nanoajax';
+import nanoajax from 'nanoajax'; // TODO: Remove nanoajax now that jQuery is required
+import * as jQuery from 'jquery';
 
 import 'index.scss';
+
+const $ = jQuery.noConflict();
 
 class IdeoSSO {
   get oktaAuth() {
@@ -31,6 +34,10 @@ class IdeoSSO {
 
   get ssoProfileLogoutUrl() {
     return `${this.ssoProfileHostname}/sign_out`;
+  }
+
+  get ssoProfileUserMigratedUrl() {
+    return `${this.ssoProfileHostname}/api/v1/users/migration_pending`
   }
 
   // Expected params:
@@ -212,6 +219,7 @@ class IdeoSSO {
       },
       clientId: this.opts.client,
       redirectUri: this.opts.redirect,
+      processCreds: this._checkMigratedUser.bind(this),
       idps: [
         {type: 'FACEBOOK', id: '0oad2c6zwsKAF2aEy0h7'},
         {type: 'GOOGLE', id: '0oacyjisdvanWuodH0h7'}
@@ -268,6 +276,29 @@ class IdeoSSO {
   _hoursFromNow(numHours) {
     const d = new Date();
     return d.setTime(d.getTime() + (numHours * 60 * 60 * 1000));
+  }
+
+  _checkMigratedUser(creds, callback) {
+    $.post(this.ssoProfileUserMigratedUrl, {email: creds.username})
+      .done((data, status, xhr) => {
+        if (xhr.status === 200) {
+          $('a.js-forgot-password').trigger('click');
+          setTimeout(() => {
+            const container = $('.forgot-password .o-form-content');
+            container.find('h2.okta-form-title').hide();
+            container.find('input[name="username"]').val(creds.username);
+            container.prepend([
+              $('<h2 class="okta-form-title o-form-head"></h2>').text('HELLO, AGAIN!'),
+              $('<p align="center"></p>').text('We\'ve made changes to your account, to give you access to other IDEO tools.'),
+              $('<p align="center"></p>').text('Let\'s do a quick reset of your password, so you can take full advantage of the full power of what we\'re building.')
+            ]);
+          }, 250);
+        } else {
+          callback();
+        }
+      }).fail(() => {
+        callback();
+      });
   }
 }
 

@@ -50,6 +50,7 @@
   "homepage": "https://github.com/ideo/sso-js-sdk",
   "dependencies": {
     "@okta/okta-signin-widget": "^2.4.0",
+    "jquery": "^2.2.4",
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.4",
     "nanoajax": "^0.4.3",
