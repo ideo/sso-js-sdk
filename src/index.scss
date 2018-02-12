@@ -12,6 +12,10 @@
   font-weight: 100;
 }
 
+@mixin fancy-body {
+  font-family: 'Domine', Georgia, Times, 'Times New Roman', serif;
+}
+
 #okta-sign-in.auth-container {
   margin: 0 auto;
 
@@ -141,6 +145,13 @@
   .link:link,
   .registration-link {
     color: #009fe3;
+  }
+
+  p.fancy-body {
+    @include fancy-body();
+    font-size: 16px;
+    margin-bottom: 1em;
+    color: black;
   }
 
   /*

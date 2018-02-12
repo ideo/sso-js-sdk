@@ -37,7 +37,7 @@ class IdeoSSO {
   }
 
   get ssoProfileUserMigratedUrl() {
-    return `${this.ssoProfileHostname}/api/v1/users/migration_pending`
+    return `${this.ssoProfileHostname}/api/v1/user_migrations`;
   }
 
   // Expected params:
@@ -126,6 +126,9 @@ class IdeoSSO {
           // Set cookie on SSO Profile app so we know where to
           // redirect user back to from reset password link
           this._saveForgotPasswordRedirect(window.location.href);
+
+          // If the user came in from a migration, we now mark the user as migrated
+          this._flagUserAsMigrated();
           return;
         }
 
@@ -242,7 +245,7 @@ class IdeoSSO {
   }
 
   _getCookie(key) {
-    return Cookies.get(key);
+    return Cookies.get(`IdeoSSO-${key}`);
   }
 
   // Sets cookie so we can redirect user back to the app they used to initiate the password reset
@@ -266,19 +269,32 @@ class IdeoSSO {
     return d.setTime(d.getTime() + (numHours * 60 * 60 * 1000));
   }
 
+  _flagUserAsMigrated() {
+    const email = this._getCookie('MigrationUser');
+    if (email) {
+      $.ajax(this.ssoProfileUserMigratedUrl, {
+        type: 'DELETE',
+        data: {email}
+      });
+    }
+  }
+
   _checkMigratedUser(creds, callback) {
-    $.post(this.ssoProfileUserMigratedUrl, {email: creds.username})
+    $.get(this.ssoProfileUserMigratedUrl, {email: creds.username})
       .done((data, status, xhr) => {
         if (xhr.status === 200) {
           $('a.js-forgot-password').trigger('click');
+          this._setCookie('MigrationUser', creds.username, 2);
           setTimeout(() => {
             const container = $('.forgot-password .o-form-content');
             container.find('h2.okta-form-title').hide();
             container.find('input[name="username"]').val(creds.username);
+            // Have to trigger a user-event on the input so that Okta's validation captures the value change
+            container.find('input[name="username"]').trigger($.Event('keydown', {which: 39})); // eslint-disable-line new-cap
             container.prepend([
               $('<h2 class="okta-form-title o-form-head"></h2>').text('HELLO, AGAIN!'),
-              $('<p align="center"></p>').text('We\'ve made changes to your account, to give you access to other IDEO tools.'),
-              $('<p align="center"></p>').text('Let\'s do a quick reset of your password, so you can take full advantage of the full power of what we\'re building.')
+              $('<p class="fancy-body" align="center"></p>').text('We\'ve made changes to your account, to give you access to other IDEO tools.'),
+              $('<p class="fancy-body" align="center"></p>').text('Let\'s do a quick reset of your password, so you can take full advantage of the full power of what we\'re building.')
             ]);
           }, 250);
         } else {
