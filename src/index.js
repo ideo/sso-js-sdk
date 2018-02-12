@@ -200,20 +200,8 @@ class IdeoSSO {
         state: this.opts.state,
         scopes: ['openid', 'email', 'profile']
       },
-      registration: {
-        // THIS will be fixed later
-        // parseSchema: (schema, onSuccess, onFailure) => {
-        //   console.log('parseSchema', schema, onSuccess, onFailure);
-        // },
-        // preSubmit: (postData, onSuccess, onFailure) => {
-        //   console.log('preSubmit', postData, onSuccess, onFailure);
-        // },
-        // postSubmit: (response, onSuccess, onFailure) => {
-        //   console.log('postSubmit', response, onSuccess, onFailure);
-        // }
-      },
       features: {
-        router: false,
+        router: true,
         registration: true,
         rememberMe: true
       },
