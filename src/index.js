@@ -20,11 +20,11 @@ class IdeoSSO {
   }
 
   get oktaBaseUrl() {
-    return this.opts.env === 'production' ? 'https://dev-744644.oktapreview.com' : '';
+    return 'https://dev-744644.oktapreview.com';
   }
 
   get ssoProfileHostname() {
-    return 'https://profile.ideo.com';
+    return this.opts.env === 'staging' ? 'https://ideo-sso-profile-staging.herokuapp.com' : 'https://profile.ideo.com';
   }
 
   // URL used to set a forgot password redirect cookie
