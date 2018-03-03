@@ -24,7 +24,7 @@ class IdeoSSO {
   }
 
   get ssoProfileHostname() {
-    return 'https://ideo-sso-profile.herokuapp.com';
+    return 'https://profile.ideo.com';
   }
 
   // URL used to set a forgot password redirect cookie
