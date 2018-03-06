@@ -5,10 +5,12 @@ import merge from 'lodash/merge';
 import Cookies from 'js-cookie';
 import nanoajax from 'nanoajax'; // TODO: Remove nanoajax now that jQuery is required
 import * as jQuery from 'jquery';
+import promiseFinallyShim from 'promise.prototype.finally';
 
 import 'index.scss';
 
 const $ = jQuery.noConflict();
+promiseFinallyShim.shim();
 
 class IdeoSSO {
   get oktaAuth() {
