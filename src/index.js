@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import OktaSignIn from '@okta/okta-signin-widget';
 import OktaAuth from '@okta/okta-auth-js/jquery';
 import uuidv4 from 'uuid/v4';
