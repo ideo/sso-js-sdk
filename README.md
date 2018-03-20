@@ -40,7 +40,8 @@ You'll find usage instructions in our demo app: (ideo/sso-demo-rails)[https://gi
 
 1. Use (nvm)[https://github.com/creationix/nvm] to ensure consistent node version
 2. `npm install`
-3. Configure an AWS profile:
+3. Install (AWS CLI)[https://aws.amazon.com/cli/] using (pip)[https://pip.readthedocs.io/en/stable/installing/]
+4. Configure an AWS profile:
 
 ```
 aws configure --profile ideo-sso
@@ -54,6 +55,7 @@ aws configure --profile ideo-sso
 5. Link the fork locally
 ```
 cd /path/to/okta-signin-widget
+npm run build:release
 npm link
 cd /path/to/sso-js-sdk
 npm link @okta/okta-signin-widget
@@ -62,7 +64,7 @@ npm link @okta/okta-signin-widget
 
 ## Develop
 
-1. `npm start`
+1. `npm start` (will build and then run webpack-dev-server)
 2. Scripts will be available for use on http://localhost:9000 (e.g. http://localhost:9000/js/ideo-sso-js-sdk.js)
 
 ## Deployment
