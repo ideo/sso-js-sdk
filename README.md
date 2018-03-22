@@ -2,37 +2,7 @@
 
 This repository is the source driving the client-side of IDEO's Network Tool SSO account system.
 
-# Using the SDK in your application
-
-## Registration
-
-Register your application by submitting your whitelisted URLs to the IDEO SSO team to retrieve a Client ID.
-
-## Installation
-
-Place in `<head>`:
-
-```html
-<link href="https://d3none3dlnlrde.cloudfront.net/1.0/css/ideo-sso-js-sdk.min.css" rel="stylesheet" />
-```
-
-Place before `</body>`:
-
-```html
-<script type="text/javascript" src="https://d3none3dlnlrde.cloudfront.net/1.0/js/ideo-sso-js-sdk.min.js"></script>
-<script type="text/javascript">
-  IdeoSSO.init({
-    env: 'staging' || 'production',
-    client: 'MY_CLIENT_ID',
-    redirect: 'https://mysite.com/path/to/callback'
-  });
-</script>
-```
-
-## Usage
-
-You'll find usage instructions in our demo app: (ideo/sso-demo-rails)[https://github.com/ideo/sso-demo-rails]
-
+You'll find [usage instructions in our wiki](https://github.com/ideo/ideo-products/wiki/Ideo-SSO#2-add-the-js-sdk).
 
 # Developing the SDK
 
@@ -40,9 +10,11 @@ You'll find usage instructions in our demo app: (ideo/sso-demo-rails)[https://gi
 
 1. Use (nvm)[https://github.com/creationix/nvm] to ensure consistent node version
 2. `npm install`
-3. Install (AWS CLI)[https://aws.amazon.com/cli/] using (pip)[https://pip.readthedocs.io/en/stable/installing/]
-4. Configure an AWS profile:
+3. Install (AWS CLI)[https://aws.amazon.com/cli/]
+  - Option 1: using (pip)[https://pip.readthedocs.io/en/stable/installing/]. If you see the `Uninstalling a distutils installed project (six) has been deprecated` error, you can try running the install with these flags: `pip install awsebcli --upgrade --ignore-installed six`
+  - Option 2: using brew: `brew install awscli`
 
+4. Configure an AWS profile after provisioning the profile in IAM:
 ```
 aws configure --profile ideo-sso
   AWS Access Key ID [None]: *****
@@ -60,7 +32,6 @@ npm link
 cd /path/to/sso-js-sdk
 npm link @okta/okta-signin-widget
 ```
-
 
 ## Develop
 
