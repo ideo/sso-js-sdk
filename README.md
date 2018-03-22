@@ -43,6 +43,6 @@ npm link @okta/okta-signin-widget
 Build & deploy to the S3 environment:
 
 ```
-npm run deploy:prod
-npm run deploy:stg
+npm run deploy:production
+npm run deploy:staging
 ```
