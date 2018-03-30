@@ -291,9 +291,8 @@ class IdeoSSO {
             // Have to trigger a user-event on the input so that Okta's validation captures the value change
             container.find('input[name="username"]').trigger($.Event('keydown', {which: 39})); // eslint-disable-line new-cap
             container.prepend([
-              $('<h2 class="okta-form-title o-form-head"></h2>').text('HELLO, AGAIN!'),
-              $('<p class="fancy-body" align="center"></p>').text('We\'ve made changes to your account, to give you access to other IDEO tools.'),
-              $('<p class="fancy-body" align="center"></p>').text('Let\'s do a quick reset of your password, so you can take full advantage of the full power of what we\'re building.')
+              $('<h2 class="okta-form-title o-form-head"></h2>').text('HELLO AGAIN!'),
+              $('<p class="fancy-body" align="center"></p>').text('We recently made a system update, which means you\'ll need to reset your password.')
             ]);
           }, 250);
         } else {
