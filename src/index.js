@@ -278,6 +278,13 @@ class IdeoSSO {
     }
   }
 
+  _setForgotPasswordEmail(email) {
+    const container = $('.forgot-password form');
+    container.find('input[name="username"]').val(email);
+    // Have to trigger a user-event on the input so that Okta's validation captures the value change
+    container.find('input[name="username"]').trigger($.Event('keydown', {which: 39})); // eslint-disable-line new-cap
+  }
+
   _checkMigratedUser(creds, callback) {
     $.get(this.ssoProfileUserMigratedUrl, {email: creds.username})
       .done((data, status, xhr) => {
@@ -285,11 +292,9 @@ class IdeoSSO {
           $('a.js-forgot-password').trigger('click');
           this._setCookie('MigrationUser', creds.username, 2);
           setTimeout(() => {
-            const container = $('.forgot-password .o-form-content');
+            const container = $('.forgot-password form');
             container.find('h2.okta-form-title').hide();
-            container.find('input[name="username"]').val(creds.username);
-            // Have to trigger a user-event on the input so that Okta's validation captures the value change
-            container.find('input[name="username"]').trigger($.Event('keydown', {which: 39})); // eslint-disable-line new-cap
+            this._setForgotPasswordEmail(creds.username);
             container.prepend([
               $('<h2 class="okta-form-title o-form-head"></h2>').text('HELLO AGAIN!'),
               $('<p class="fancy-body" align="center"></p>').text('We recently made a system update, which means you\'ll need to reset your password.')
