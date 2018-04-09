@@ -26,13 +26,17 @@ class IdeoSSO {
     return 'https://dev-744644.oktapreview.com';
   }
 
-  get ssoProfileHostname() {
-    return this.opts.env === 'staging' ? 'https://ideo-sso-profile-staging.herokuapp.com' : 'https://profile.ideo.com';
+  get env() {
+    return this.opts.env || 'production';
   }
 
-  // URL used to set a forgot password redirect cookie
-  get ssoProfileSetRedirectUrl() {
-    return `${this.ssoProfileHostname}/cookies/forgot_password_redirect`;
+  get ssoProfileHostname() {
+    switch (this.env) {
+      case 'production': return 'https://profile.ideo.com';
+      case 'staging': return 'https://ideo-sso-profile-staging.herokuapp.com';
+      case 'local': return 'http://localhost:3000';
+      default: return null;
+    }
   }
 
   get ssoProfileLogoutUrl() {
@@ -41,6 +45,27 @@ class IdeoSSO {
 
   get ssoProfileUserMigratedUrl() {
     return `${this.ssoProfileHostname}/api/v1/user_migrations`;
+  }
+
+  get ssoProfileForgotPasswordUrl() {
+    return `${this.ssoProfileHostname}/#signin/forgot-password`;
+  }
+
+  get ssoProfileSignUpUrl() {
+    return `${this.ssoProfileHostname}/#signin/register`;
+  }
+
+  get ssoProfileLoginUrl() {
+    return this.ssoProfileHostname;
+  }
+
+  get ssoProfileSettingsUrl() {
+    return `${this.ssoProfileHostname}/profile`;
+  }
+
+  // Old function name - keep around until fully deprecated
+  getSettingsUrl() {
+    return `${this.ssoProfileHostname}/profile`;
   }
 
   // Expected params:
@@ -58,12 +83,27 @@ class IdeoSSO {
     }
   }
 
-  signIn() {
-    window.location.href = `${this.ssoProfileHostname}/oauth?client_id=${this.opts.client}` +
+  signUp(email = null) {
+    // Auto-fill email if provided
+    let url = this.ssoProfileSignUpUrl;
+    if (email) {
+      url += `?email=${encodeURIComponent(email)}`;
+    }
+    // Sign out user if they were signed in,
+    // and redirect to sign up with email (if given)
+    this.logout(url);
+  }
+
+  signIn(email = null) {
+    let url = `${this.ssoProfileHostname}/oauth?client_id=${this.opts.client}` +
       '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
       `&state=${this.opts.state}`;
     // '&nonce=n-0S6_WzA2Mj' + // eslint-disable-line
     // `&sessionToken=${res.session.token}`;
+    if (email) {
+      url += `&email=${encodeURIComponent(email)}`;
+    }
+    window.location.href = url;
   }
 
   logout(redirect = null) {
@@ -84,10 +124,6 @@ class IdeoSSO {
         });
       });
     });
-  }
-
-  getSettingsUrl() {
-    return `${this.ssoProfileHostname}/profile`;
   }
 
   _reviveSession() {
@@ -199,6 +235,7 @@ class IdeoSSO {
   }
 
   _setupOktaSignIn() {
+    // Docs: https://github.com/okta/okta-signin-widget#new-oktasigninconfig
     const params = {
       baseUrl: this.oktaBaseUrl,
       authParams: {
@@ -252,17 +289,6 @@ class IdeoSSO {
     return Cookies.get(`IdeoSSO-${key}`);
   }
 
-  // Sets cookie so we can redirect user back to the app they used to initiate the password reset
-  //
-  // Notes:
-  // Safari needs a POST request to set a cross-domain cookie.
-  // IE8 and IE9 do not support setting cookies in cross-domain requests.
-
-  _saveForgotPasswordRedirect(url) {
-    const saveRedirectUrl = `${this.ssoProfileSetRedirectUrl}?url=${encodeURIComponent(url)}`;
-    $.post(saveRedirectUrl);
-  }
-
   _hoursFromNow(numHours) {
     const d = new Date();
     return d.setTime(d.getTime() + (numHours * 60 * 60 * 1000));
@@ -278,8 +304,8 @@ class IdeoSSO {
     }
   }
 
-  _setForgotPasswordEmail(email) {
-    const container = $('.forgot-password form');
+  _setEmailInputValue(email) {
+    const container = $('#okta-target form');
     container.find('input[name="username"]').val(email);
     // Have to trigger a user-event on the input so that Okta's validation captures the value change
     container.find('input[name="username"]').trigger($.Event('keydown', {which: 39})); // eslint-disable-line new-cap
@@ -294,7 +320,7 @@ class IdeoSSO {
           setTimeout(() => {
             const container = $('.forgot-password form');
             container.find('h2.okta-form-title').hide();
-            this._setForgotPasswordEmail(creds.username);
+            this._setEmailInputValue(creds.username);
             container.prepend([
               $('<h2 class="okta-form-title o-form-head"></h2>').text('HELLO AGAIN!'),
               $('<p class="fancy-body" align="center"></p>').text('We recently made a system update, which means you\'ll need to reset your password.')
@@ -306,6 +332,24 @@ class IdeoSSO {
       }).fail(() => {
         callback();
       });
+  }
+
+  // Deprecated functionality - keeping until we determine if we need it
+  //
+  // Sets cookie so we can redirect user back to the app they used to initiate the password reset
+  //
+  // Notes:
+  // Safari needs a POST request to set a cross-domain cookie.
+  // IE8 and IE9 do not support setting cookies in cross-domain requests.
+
+  // URL used to set a forgot password redirect cookie
+  get ssoProfileSetRedirectUrl() {
+    return `${this.ssoProfileHostname}/cookies/forgot_password_redirect`;
+  }
+
+  _saveForgotPasswordRedirect(url) {
+    const saveRedirectUrl = `${this.ssoProfileSetRedirectUrl}?url=${encodeURIComponent(url)}`;
+    $.post(saveRedirectUrl);
   }
 }
 
