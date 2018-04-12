@@ -311,6 +311,10 @@ class IdeoSSO {
     container.find('input[name="username"]').trigger($.Event('keydown', {which: 39})); // eslint-disable-line new-cap
   }
 
+  _privacyPolicyHTML() {
+    return '<div class="ideo-privacy-policy">Please take a look at our <a href="https://creativedifference.ideo.com/#/privacy" class="inline-link" target="_blank">Privacy Policy</a> to understand how we use your personal information.</div>';
+  }
+
   _checkMigratedUser(creds, callback) {
     $.get(this.ssoProfileUserMigratedUrl, {email: creds.username})
       .done((data, status, xhr) => {
@@ -318,13 +322,15 @@ class IdeoSSO {
           $('a.js-forgot-password').trigger('click');
           this._setCookie('MigrationUser', creds.username, 2);
           setTimeout(() => {
-            const container = $('.forgot-password form');
-            container.find('h2.okta-form-title').hide();
+            const form = $('.forgot-password form');
+            form.find('h2.okta-form-title').hide();
             this._setEmailInputValue(creds.username);
-            container.prepend([
+            form.prepend([
               $('<h2 class="okta-form-title o-form-head"></h2>').text('HELLO AGAIN!'),
               $('<p class="fancy-body" align="center"></p>').text('We recently made a system update, which means you\'ll need to reset your password.')
             ]);
+            const footer = $('.forgot-password .auth-footer');
+            footer.append(this._privacyPolicyHTML());
           }, 250);
         } else {
           callback();
