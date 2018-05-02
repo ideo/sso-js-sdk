@@ -4,7 +4,6 @@ import OktaAuth from '@okta/okta-auth-js/jquery';
 import uuidv4 from 'uuid/v4';
 import merge from 'lodash/merge';
 import Cookies from 'js-cookie';
-import nanoajax from 'nanoajax'; // TODO: Remove nanoajax now that jQuery is required
 import * as jQuery from 'jquery';
 import promiseFinallyShim from 'promise.prototype.finally';
 
@@ -14,18 +13,6 @@ const $ = jQuery.noConflict();
 promiseFinallyShim.shim();
 
 class IdeoSSO {
-  get oktaAuth() {
-    return this._oktaAuth || this._setupOktaAuth();
-  }
-
-  get oktaSignIn() {
-    return this._oktaSignIn || this._setupOktaSignIn();
-  }
-
-  get oktaBaseUrl() {
-    return 'https://dev-744644.oktapreview.com';
-  }
-
   get env() {
     return this.opts.env || 'production';
   }
@@ -39,33 +26,41 @@ class IdeoSSO {
     }
   }
 
+  get ssoProfileLoginUrl() {
+    return this.ssoProfileHostname;
+  }
+
   get ssoProfileLogoutUrl() {
-    return `${this.ssoProfileHostname}/sign_out`;
-  }
-
-  get ssoProfileUserMigratedUrl() {
-    return `${this.ssoProfileHostname}/api/v1/user_migrations`;
-  }
-
-  get ssoProfileForgotPasswordUrl() {
-    return `${this.ssoProfileHostname}/#signin/forgot-password`;
+    return `${this.ssoProfileHostname}/users/sign_out`;
   }
 
   get ssoProfileSignUpUrl() {
-    return `${this.ssoProfileHostname}/#signin/register`;
+    return `${this.ssoProfileHostname}/users/sign_up`;
   }
 
-  get ssoProfileLoginUrl() {
-    return this.ssoProfileHostname;
+  get ssoProfileForgotPasswordUrl() {
+    return `${this.ssoProfileHostname}/users/password/new`;
   }
 
   get ssoProfileSettingsUrl() {
     return `${this.ssoProfileHostname}/profile`;
   }
 
+  get baseApiUrl() {
+    return `${this.ssoProfileHostname}/api/v1`;
+  }
+
+  get ssoProfileUserMigratedUrl() {
+    return `${this.baseApiUrl}/user_migrations`;
+  }
+
+  get ssoProfileUserUrl() {
+    return `${this.baseApiUrl}/users/me`;
+  }
+
   // Old function name - keep around until fully deprecated
   getSettingsUrl() {
-    return `${this.ssoProfileHostname}/profile`;
+    return this.ssoProfileSettingsUrl;
   }
 
   // Expected params:
@@ -95,11 +90,9 @@ class IdeoSSO {
   }
 
   signIn(email = null) {
-    let url = `${this.ssoProfileHostname}/oauth?client_id=${this.opts.client}` +
-      '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
-      `&state=${this.opts.state}`;
-    // '&nonce=n-0S6_WzA2Mj' + // eslint-disable-line
-    // `&sessionToken=${res.session.token}`;
+    let url = `${this.ssoProfileLoginUrl}?client_id=${this.opts.client}` +
+      `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
+      `&state=${encodeURIComponent(this.opts.state)}`;
     if (email) {
       url += `&email=${encodeURIComponent(email)}`;
     }
@@ -108,23 +101,38 @@ class IdeoSSO {
 
   logout(redirect = null) {
     return new Promise(resolve => {
-      // Logout OKTA JS
-      this.oktaAuth.signOut().finally(() => {
-        // Logout SSO Profile app
-        nanoajax.ajax({
-          url: this.ssoProfileLogoutUrl,
-          cors: true,
-          withCredentials: true,
-          method: 'GET'
-        }, () => {
-          if (redirect) {
-            window.location.href = redirect;
-          }
-          resolve();
-        });
+      // Logout SSO Profile app
+      $.ajax({
+        url: this.ssoProfileLogoutUrl,
+        cors: true,
+        withCredentials: true,
+        method: 'GET'
+      }, () => {
+        if (redirect) {
+          window.location.href = redirect;
+        }
+        resolve();
       });
     });
   }
+
+  getUserInfo = () => {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        dataType: 'json',
+        url: this.ssoProfileUserUrl,
+        cors: true,
+        withCredentials: true,
+        method: 'GET'
+      }).then(data => {
+        resolve(data);
+      }).catch(err => {
+        reject(err);
+      });
+    });
+  }
+
+  // Private
 
   _reviveSession() {
     return new Promise((resolve, reject) => {
@@ -137,7 +145,6 @@ class IdeoSSO {
             this.opts.client + '&response_type=code&scope=openid+profile+email&prompt=none' +
             '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
             '&state=' + encodeURIComponent(this.opts.state);
-          // TODO: nonce + '&nonce=TODOn-0S6_WzA2Mj';
           return data;
         }).catch(() => {
           this.oktaAuth.session.close();
@@ -149,6 +156,46 @@ class IdeoSSO {
         return reject(new Error('Not logged in'));
       });
     });
+  }
+
+  _setupStateCookie() {
+    this.opts.state = uuidv4();
+    // TODO: https only cookie
+    this._setCookie('State', this.opts.state, 2);
+  }
+
+  _setCookie(key, value, expiresInHours = 1, domain = null) {
+    const opts = {expires: this._hoursFromNow(expiresInHours)};
+
+    if (domain) {
+      opts.domain = domain;
+    }
+
+    return Cookies.set(`IdeoSSO-${key}`, value, opts);
+  }
+
+  _getCookie(key) {
+    return Cookies.get(`IdeoSSO-${key}`);
+  }
+
+  _hoursFromNow(numHours) {
+    const d = new Date();
+    return d.setTime(d.getTime() + (numHours * 60 * 60 * 1000));
+  }
+
+  // Deprecated functionality - keeping until we determine if we need it
+  //
+
+  get oktaAuth() {
+    return this._oktaAuth || this._setupOktaAuth();
+  }
+
+  get oktaSignIn() {
+    return this._oktaSignIn || this._setupOktaSignIn();
+  }
+
+  get oktaBaseUrl() {
+    return 'https://dev-744644.oktapreview.com';
   }
 
   _renderSignIn(selector) {
@@ -269,31 +316,6 @@ class IdeoSSO {
     return this._oktaSignIn;
   }
 
-  _setupStateCookie() {
-    this.opts.state = uuidv4();
-    // TODO: https only cookie
-    this._setCookie('State', this.opts.state, 2);
-  }
-
-  _setCookie(key, value, expiresInHours = 1, domain = null) {
-    const opts = {expires: this._hoursFromNow(expiresInHours)};
-
-    if (domain) {
-      opts.domain = domain;
-    }
-
-    return Cookies.set(`IdeoSSO-${key}`, value, opts);
-  }
-
-  _getCookie(key) {
-    return Cookies.get(`IdeoSSO-${key}`);
-  }
-
-  _hoursFromNow(numHours) {
-    const d = new Date();
-    return d.setTime(d.getTime() + (numHours * 60 * 60 * 1000));
-  }
-
   _flagUserAsMigrated() {
     const email = this._getCookie('MigrationUser');
     if (email) {
@@ -332,24 +354,6 @@ class IdeoSSO {
       }).fail(() => {
         callback();
       });
-  }
-
-  // Deprecated functionality - keeping until we determine if we need it
-  //
-  // Sets cookie so we can redirect user back to the app they used to initiate the password reset
-  //
-  // Notes:
-  // Safari needs a POST request to set a cross-domain cookie.
-  // IE8 and IE9 do not support setting cookies in cross-domain requests.
-
-  // URL used to set a forgot password redirect cookie
-  get ssoProfileSetRedirectUrl() {
-    return `${this.ssoProfileHostname}/cookies/forgot_password_redirect`;
-  }
-
-  _saveForgotPasswordRedirect(url) {
-    const saveRedirectUrl = `${this.ssoProfileSetRedirectUrl}?url=${encodeURIComponent(url)}`;
-    $.post(saveRedirectUrl);
   }
 }
 
