@@ -43,7 +43,7 @@
     "type": "git",
     "url": "https://github.com/ideo/sso-js-sdk.git"
   },
-  "author": "Matt Winkler <mwinkler@ideo.com>",
+  "author": "Josh Schwartzman <jschwartzman@ideo.com>",
   "bugs": {
     "url": "https://github.com/ideo/sso-js-sdk/issues"
   },
@@ -54,7 +54,6 @@
     "jquery": "^2.2.4",
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.4",
-    "nanoajax": "^0.4.3",
     "promise.prototype.finally": "^3.1.0",
     "uuid": "^3.1.0"
   }

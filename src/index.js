@@ -4,7 +4,6 @@ import OktaAuth from '@okta/okta-auth-js/jquery';
 import uuidv4 from 'uuid/v4';
 import merge from 'lodash/merge';
 import Cookies from 'js-cookie';
-import nanoajax from 'nanoajax'; // TODO: Remove nanoajax now that jQuery is required
 import * as jQuery from 'jquery';
 import promiseFinallyShim from 'promise.prototype.finally';
 
@@ -48,11 +47,11 @@ class IdeoSSO {
   }
 
   get ssoProfileForgotPasswordUrl() {
-    return `${this.ssoProfileHostname}/#signin/forgot-password`;
+    return `${this.ssoProfileHostname}/signin/forgot-password`;
   }
 
   get ssoProfileSignUpUrl() {
-    return `${this.ssoProfileHostname}/#signin/register`;
+    return `${this.ssoProfileHostname}/signin/register`;
   }
 
   get ssoProfileLoginUrl() {
@@ -85,9 +84,9 @@ class IdeoSSO {
 
   signUp(email = null) {
     // Auto-fill email if provided
-    let url = this.ssoProfileSignUpUrl;
+    let url = this.ssoProfileSignUpUrl + this._oauthQueryParams();
     if (email) {
-      url += `?email=${encodeURIComponent(email)}`;
+      url += `&email=${encodeURIComponent(email)}`;
     }
     // Sign out user if they were signed in,
     // and redirect to sign up with email (if given)
@@ -95,32 +94,36 @@ class IdeoSSO {
   }
 
   signIn(email = null) {
-    let url = `${this.ssoProfileHostname}/oauth?client_id=${this.opts.client}` +
-      '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
-      `&state=${this.opts.state}`;
-    // '&nonce=n-0S6_WzA2Mj' + // eslint-disable-line
-    // `&sessionToken=${res.session.token}`;
+    let url = `${this.ssoProfileHostname}/oauth${this._oauthQueryParams()}`;
     if (email) {
       url += `&email=${encodeURIComponent(email)}`;
     }
     window.location.href = url;
   }
 
+  _oauthQueryParams() {
+    return `?client_id=${this.opts.client}` +
+           `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
+           `&state=${this.opts.state}`;
+  }
+
   logout(redirect = null) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       // Logout OKTA JS
       this.oktaAuth.signOut().finally(() => {
         // Logout SSO Profile app
-        nanoajax.ajax({
-          url: this.ssoProfileLogoutUrl,
+        $.ajax({
+          url: this.logoutUrl,
           cors: true,
           withCredentials: true,
           method: 'GET'
-        }, () => {
+        }).then(() => {
           if (redirect) {
             window.location.href = redirect;
           }
           resolve();
+        }, err => {
+          reject(err);
         });
       });
     });
