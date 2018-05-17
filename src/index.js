@@ -75,13 +75,7 @@ class IdeoSSO {
   }
 
   signUp(email = null) {
-    // Sign out user if they were signed in,
-    // and redirect to sign up with email (if given)
-    let url = this.signUpUrl;
-    if (email) {
-      url += `?email=${encodeURIComponent(email)}`;
-    }
-    this.logout(url);
+    window.location.href = `${this.signUpUrl}${this._oauthQueryParams(email)}`;
   }
 
   signIn(email = null) {
@@ -126,11 +120,14 @@ class IdeoSSO {
   }
 
   // Private
-
   _authorizeUrl(email = null) {
-    let url = `${this.authorizeUrl}?client_id=${this.opts.client}` +
-      `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
-      `&state=${encodeURIComponent(this.opts.state)}`;
+    return `${this.authorizeUrl}${this._oauthQueryParams(email)}`;
+  }
+
+  _oauthQueryParams(email) {
+    let url = `?client_id=${this.opts.client}` +
+              `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
+              `&state=${encodeURIComponent(this.opts.state)}`;
     if (email) {
       url += `&email=${encodeURIComponent(email)}`;
     }
