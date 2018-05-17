@@ -127,37 +127,12 @@ class IdeoSSO {
   _oauthQueryParams(email) {
     let url = `?client_id=${this.opts.client}` +
               `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
+              `&response_type=code` +
               `&state=${encodeURIComponent(this.opts.state)}`;
     if (email) {
       url += `&email=${encodeURIComponent(email)}`;
     }
     return url;
-  }
-
-  _reviveSession() {
-    /* eslint-disable */
-    // return new Promise((resolve, reject) => {
-    //   this.oktaAuth.session.get().then(res => {
-    //     if (res.status !== 'ACTIVE') {
-    //       return reject(new Error('Not logged in'));
-    //     }
-    //     this.oktaAuth.token.getWithoutPrompt().then(data => {
-    //       window.location.href = 'https://dev-744644.oktapreview.com/oauth2/v1/authorize?client_id=' +
-    //         this.opts.client + '&response_type=code&scope=openid+profile+email&prompt=none' +
-    //         '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
-    //         '&state=' + encodeURIComponent(this.opts.state);
-    //       return data;
-    //     }).catch(() => {
-    //       this.oktaAuth.session.close();
-    //       return reject(new Error('Not logged in'));
-    //     });
-    //   }).catch(err => {
-    //     // Not logged in
-    //     console.info('Not logged in:', err);
-    //     return reject(new Error('Not logged in'));
-    //   });
-    // });
-    /* eslint-enable */
   }
 
   _setupStateCookie() {
