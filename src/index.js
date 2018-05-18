@@ -5,60 +5,12 @@ import Cookies from 'js-cookie';
 import * as jQuery from 'jquery';
 import promiseFinallyShim from 'promise.prototype.finally';
 
+import SSOAppRoutes from 'sso_app_routes';
+
 const $ = jQuery.noConflict();
 promiseFinallyShim.shim();
 
 class IdeoSSO {
-  get env() {
-    return this.opts.env || 'production';
-  }
-
-  get hostname() {
-    switch (this.env) {
-      case 'production': return 'https://profile.ideo.com';
-      case 'staging': return 'https://ideo-sso-profile-staging.herokuapp.com';
-      case 'local': return 'http://localhost:3000';
-      default: return null;
-    }
-  }
-
-  get logoutUrl() {
-    return `${this.hostname}/users/sign_out`;
-  }
-
-  get signUpUrl() {
-    return `${this.hostname}/users/sign_up`;
-  }
-
-  get authorizeUrl() {
-    return `${this.hostname}/oauth/authorize`;
-  }
-
-  get forgotPasswordUrl() {
-    return `${this.hostname}/users/password/new`;
-  }
-
-  get settingsUrl() {
-    return `${this.hostname}/profile`;
-  }
-
-  get baseApiUrl() {
-    return `${this.hostname}/api/v1`;
-  }
-
-  get userMigratedUrl() {
-    return `${this.baseApiUrl}/user_migrations`;
-  }
-
-  get userUrl() {
-    return `${this.baseApiUrl}/users/me`;
-  }
-
-  // Old function name - keep around until fully deprecated
-  getSettingsUrl() {
-    return this.ssoProfileSettingsUrl;
-  }
-
   // Expected params:
   //  env
   //  client
@@ -74,8 +26,24 @@ class IdeoSSO {
     }
   }
 
+  get env() {
+    return this.opts.env || 'production';
+  }
+
+  get signInUrl() {
+    return this._routes.signInUrl;
+  }
+
+  get signUpUrl() {
+    return this._routes.signUpUrl;
+  }
+
+  get profileUrl() {
+    return this._routes.profileUrl;
+  }
+
   signUp(email = null) {
-    window.location.href = `${this.signUpUrl}${this._oauthQueryParams(email)}`;
+    window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams(email)}`;
   }
 
   signIn(email = null) {
@@ -86,7 +54,7 @@ class IdeoSSO {
     return new Promise((resolve, reject) => {
       // Logout SSO Profile app
       $.ajax({
-        url: this.logoutUrl,
+        url: this._routes.logoutUrl,
         cors: true,
         withCredentials: true,
         method: 'GET'
@@ -105,7 +73,7 @@ class IdeoSSO {
   getUserInfo() {
     return new Promise((resolve, reject) => {
       $.ajax({
-        url: this.userUrl,
+        url: this._routes.userUrl,
         dataType: 'json',
         cors: true,
         withCredentials: true,
@@ -120,8 +88,16 @@ class IdeoSSO {
   }
 
   // Private
+  get _routes() {
+    if (!this._ssoRoutesInstance) {
+      SSOAppRoutes.init(this.env);
+      this._ssoRoutesInstance = SSOAppRoutes;
+    }
+    return this._ssoRoutesInstance;
+  }
+
   _authorizeUrl(email = null) {
-    return `${this.authorizeUrl}${this._oauthQueryParams(email)}`;
+    return `${this._routes.authorizeUrl}${this._oauthQueryParams(email)}`;
   }
 
   _oauthQueryParams(email) {
