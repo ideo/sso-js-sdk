@@ -90,7 +90,7 @@ class IdeoSSO {
   // Private
   get _routes() {
     if (!this._ssoRoutesInstance) {
-      SSOAppRoutes.init(this.env);
+      SSOAppRoutes.init({env: this.env});
       this._ssoRoutesInstance = SSOAppRoutes;
     }
     return this._ssoRoutesInstance;
