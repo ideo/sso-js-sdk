@@ -42,6 +42,11 @@ class IdeoSSO {
     return this._routes.profileUrl;
   }
 
+  // Legacy method that we're still supporting
+  getSettingsUrl() {
+    return this.profileUrl;
+  }
+
   signUp(email = null) {
     window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams(email)}`;
   }

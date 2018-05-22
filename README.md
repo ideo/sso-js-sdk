@@ -23,16 +23,6 @@ aws configure --profile ideo-sso
   Default output format [None]: text
 ```
 
-4. Grab the latest from our [signin widget fork](https://github.com/ideo/okta-signin-widget)
-5. Link the fork locally
-```
-cd /path/to/okta-signin-widget
-npm run build:release
-npm link
-cd /path/to/sso-js-sdk
-npm link @okta/okta-signin-widget
-```
-
 ## Develop
 
 1. `npm start` (will build and then run webpack-dev-server)
