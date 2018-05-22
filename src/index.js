@@ -54,7 +54,7 @@ class IdeoSSO {
     return new Promise((resolve, reject) => {
       // Logout SSO Profile app
       $.ajax({
-        url: this._routes.logoutUrl,
+        url: this._routes.apiUserSignOutUrl,
         cors: true,
         withCredentials: true,
         method: 'GET'
@@ -73,7 +73,7 @@ class IdeoSSO {
   getUserInfo() {
     return new Promise((resolve, reject) => {
       $.ajax({
-        url: this._routes.userUrl,
+        url: this._routes.apiUserUrl,
         dataType: 'json',
         cors: true,
         withCredentials: true,

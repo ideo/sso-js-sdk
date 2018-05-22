@@ -42,12 +42,16 @@ class SSOAppRoutes {
     return `${this.hostname}/api/v1`;
   }
 
-  get userMigratedUrl() {
+  get apiUserMigrationsUrl() {
     return `${this.baseApiUrl}/user_migrations`;
   }
 
-  get userUrl() {
+  get apiUserUrl() {
     return `${this.baseApiUrl}/users/me`;
+  }
+
+  get apiUserSignOutUrl() {
+    return `${this.baseApiUrl}/users/sign_out`;
   }
 }
 
