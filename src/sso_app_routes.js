@@ -50,8 +50,8 @@ class SSOAppRoutes {
     return `${this.baseApiUrl}/users/me`;
   }
 
-  get apiUserSignOutUrl() {
-    return `${this.baseApiUrl}/users/sign_out`;
+  get apiUserSessionDestroyUrl() {
+    return `${this.baseApiUrl}/sessions/`;
   }
 }
 

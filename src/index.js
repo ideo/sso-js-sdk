@@ -54,12 +54,12 @@ class IdeoSSO {
     return new Promise((resolve, reject) => {
       // Logout SSO Profile app
       $.ajax({
-        url: this._routes.apiUserSignOutUrl,
-        cors: true,
-        withCredentials: true,
-        method: 'GET'
+        url: this._routes.apiUserSessionDestroyUrl,
+        xhrFields: {
+          withCredentials: true
+        },
+        method: 'DELETE'
       }).then(() => {
-        console.log('got here', redirect);
         if (redirect) {
           window.location.href = redirect;
         }
@@ -75,8 +75,9 @@ class IdeoSSO {
       $.ajax({
         url: this._routes.apiUserUrl,
         dataType: 'json',
-        cors: true,
-        withCredentials: true,
+        xhrFields: {
+          withCredentials: true
+        },
         method: 'GET',
         async: false
       }).then(data => {
