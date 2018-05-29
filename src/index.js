@@ -118,9 +118,15 @@ class IdeoSSO {
   }
 
   _setupStateCookie() {
-    this.opts.state = uuidv4();
-    // TODO: https only cookie
-    this._setCookie('State', this.opts.state, 2);
+    // Check if there is an existing cookie, if so use it.
+    if (this._getCookie('State')) {
+      this.opts.state = this._getCookie('State');
+    } else {
+      // Generate new state cookie
+      this.opts.state = uuidv4();
+      // TODO: https only cookie
+      this._setCookie('State', this.opts.state, 2);
+    }
   }
 
   _setCookie(key, value, expiresInHours = 1, domain = null) {
