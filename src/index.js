@@ -122,15 +122,22 @@ class IdeoSSO {
     if (this._getCookie('State')) {
       this.opts.state = this._getCookie('State');
     } else {
-      // Generate new state cookie
+      // Generate new state
       this.opts.state = uuidv4();
-      // TODO: https only cookie
-      this._setCookie('State', this.opts.state, 2);
+      // Save for 1 week
+      this._setCookie('State', this.opts.state, 24 * 7);
     }
   }
 
+  get _isHttps() {
+    return window.location.protocol === 'https';
+  }
+
   _setCookie(key, value, expiresInHours = 1, domain = null) {
-    const opts = {expires: this._hoursFromNow(expiresInHours)};
+    const opts = {
+      expires: this._hoursFromNow(expiresInHours),
+      secure: this._isHttps
+    };
     if (domain) {
       opts.domain = domain;
     }
