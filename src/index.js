@@ -1,13 +1,13 @@
 import 'babel-polyfill';
 import uuidv4 from 'uuid/v4';
+import includes from 'lodash/includes';
 import merge from 'lodash/merge';
 import Cookies from 'js-cookie';
-import * as jQuery from 'jquery';
+import ajax from 'nanoajax';
 import promiseFinallyShim from 'promise.prototype.finally';
 
 import SSOAppRoutes from 'sso_app_routes';
 
-const $ = jQuery.noConflict();
 promiseFinallyShim.shim();
 
 class IdeoSSO {
@@ -58,37 +58,38 @@ class IdeoSSO {
   logout(redirect = null) {
     return new Promise((resolve, reject) => {
       // Logout SSO Profile app
-      $.ajax({
+      ajax({
         url: this._routes.apiUserSessionDestroyUrl,
-        xhrFields: {
-          withCredentials: true
-        },
-        method: 'DELETE'
-      }).then(() => {
-        if (redirect) {
-          window.location.href = redirect;
+        method: 'DELETE',
+        withCredentials: true,
+        cors: true
+      }, (code, response) => {
+        if (this._successfulAjaxStatus(code)) {
+          if (redirect) {
+            window.location.href = redirect;
+          }
+          resolve();
+        } else {
+          reject(response);
         }
-        resolve();
-      }, err => {
-        reject(err);
       });
     });
   }
 
   getUserInfo() {
     return new Promise((resolve, reject) => {
-      $.ajax({
+      ajax({
         url: this._routes.apiUserUrl,
-        dataType: 'json',
-        xhrFields: {
-          withCredentials: true
-        },
         method: 'GET',
-        async: false
-      }).then(data => {
-        resolve(data);
-      }, err => {
-        reject(err);
+        dataType: 'json',
+        withCredentials: true,
+        cors: true
+      }, (code, response) => {
+        if (this._successfulAjaxStatus(code)) {
+          resolve(response);
+        } else {
+          reject(response);
+        }
       });
     });
   }
@@ -151,6 +152,10 @@ class IdeoSSO {
   _hoursFromNow(numHours) {
     const d = new Date();
     return d.setTime(d.getTime() + (numHours * 60 * 60 * 1000));
+  }
+
+  _successfulAjaxStatusCode(code) {
+    return includes(['200', '301', '302'], code);
   }
 }
 
