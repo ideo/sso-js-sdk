@@ -46,6 +46,7 @@
     "babel-polyfill": "^6.26.0",
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.4",
+    "nanoajax": "^0.4.3",
     "promise.prototype.finally": "^3.1.0",
     "uuid": "^3.1.0"
   }
