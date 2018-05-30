@@ -1,7 +1,6 @@
 /* global __dirname, require, module */
 
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const path = require('path');
 const env = require('yargs').argv.env;
@@ -12,7 +11,12 @@ const fileName = `ideo-sso-js-sdk${env === 'build' ? '.min' : ''}`;
 const plugins = [];
 
 if (env === 'build') {
-  plugins.push(new UglifyJsPlugin({minimize: true}));
+  plugins.push(new UglifyJsPlugin({
+    minimize: true,
+    uglifyOptions: {
+      compress: true
+    }
+  }));
 }
 
 const config = {
