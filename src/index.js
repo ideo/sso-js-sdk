@@ -3,7 +3,7 @@ import uuidv4 from 'uuid/v4';
 import includes from 'lodash/includes';
 import merge from 'lodash/merge';
 import Cookies from 'js-cookie';
-import ajax from 'nanoajax';
+import nanoajax from 'nanoajax';
 import promiseFinallyShim from 'promise.prototype.finally';
 
 import SSOAppRoutes from 'sso_app_routes';
@@ -58,7 +58,7 @@ class IdeoSSO {
   logout(redirect = null) {
     return new Promise((resolve, reject) => {
       // Logout SSO Profile app
-      ajax({
+      nanoajax.ajax({
         url: this._routes.apiUserSessionDestroyUrl,
         method: 'DELETE',
         withCredentials: true,
@@ -78,10 +78,10 @@ class IdeoSSO {
 
   getUserInfo() {
     return new Promise((resolve, reject) => {
-      ajax({
+      nanoajax.ajax({
         url: this._routes.apiUserUrl,
         method: 'GET',
-        dataType: 'json',
+        responseType: 'json',
         withCredentials: true,
         cors: true
       }, (code, response) => {
@@ -154,8 +154,8 @@ class IdeoSSO {
     return d.setTime(d.getTime() + (numHours * 60 * 60 * 1000));
   }
 
-  _successfulAjaxStatusCode(code) {
-    return includes(['200', '301', '302'], code);
+  _successfulAjaxStatus(code) {
+    return includes([200, 301, 302], code);
   }
 }
 
