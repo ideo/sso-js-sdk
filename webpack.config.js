@@ -1,7 +1,6 @@
 /* global __dirname, require, module */
 
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const path = require('path');
 const env = require('yargs').argv.env;
@@ -9,12 +8,15 @@ const env = require('yargs').argv.env;
 const libraryName = 'IdeoSSO';
 const fileName = `ideo-sso-js-sdk${env === 'build' ? '.min' : ''}`;
 
-const plugins = [
-  new ExtractTextPlugin(`css/${fileName}.css`)
-];
+const plugins = [];
 
 if (env === 'build') {
-  plugins.push(new UglifyJsPlugin({minimize: true}));
+  plugins.push(new UglifyJsPlugin({
+    minimize: true,
+    uglifyOptions: {
+      compress: true
+    }
+  }));
 }
 
 const config = {
@@ -40,23 +42,6 @@ const config = {
         test: /\.(js)$/,
         loader: 'babel-loader',
         exclude: /(node_modules|bower_components)/
-      },
-      {
-        test: /\.(css|scss)$/,
-        exclude: /node_modules/,
-        loaders: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {loader: 'css-loader?minimize&url=false'},
-            {
-              loader: 'sass-loader',
-              options: {
-                includePaths: ['node_modules/']
-              }
-            },
-            {loader: 'postcss-loader'}
-          ]
-        })
       }
     ]
   },
@@ -66,6 +51,7 @@ const config = {
   },
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
+    watchContentBase: true,
     compress: true,
     port: 9000,
     disableHostCheck: true,

@@ -1,72 +1,16 @@
 import 'babel-polyfill';
-import OktaSignIn from '@okta/okta-signin-widget';
-import OktaAuth from '@okta/okta-auth-js/jquery';
 import uuidv4 from 'uuid/v4';
+import includes from 'lodash/includes';
 import merge from 'lodash/merge';
 import Cookies from 'js-cookie';
-import * as jQuery from 'jquery';
+import nanoajax from 'nanoajax';
 import promiseFinallyShim from 'promise.prototype.finally';
 
-import 'index.scss';
+import SSOAppRoutes from 'sso_app_routes';
 
-const $ = jQuery.noConflict();
 promiseFinallyShim.shim();
 
 class IdeoSSO {
-  get oktaAuth() {
-    return this._oktaAuth || this._setupOktaAuth();
-  }
-
-  get oktaSignIn() {
-    return this._oktaSignIn || this._setupOktaSignIn();
-  }
-
-  get oktaBaseUrl() {
-    return 'https://dev-744644.oktapreview.com';
-  }
-
-  get env() {
-    return this.opts.env || 'production';
-  }
-
-  get ssoProfileHostname() {
-    switch (this.env) {
-      case 'production': return 'https://profile.ideo.com';
-      case 'staging': return 'https://ideo-sso-profile-staging.herokuapp.com';
-      case 'local': return 'http://localhost:3000';
-      default: return null;
-    }
-  }
-
-  get ssoProfileLogoutUrl() {
-    return `${this.ssoProfileHostname}/sign_out`;
-  }
-
-  get ssoProfileUserMigratedUrl() {
-    return `${this.ssoProfileHostname}/api/v1/user_migrations`;
-  }
-
-  get ssoProfileForgotPasswordUrl() {
-    return `${this.ssoProfileHostname}/signin/forgot-password`;
-  }
-
-  get ssoProfileSignUpUrl() {
-    return `${this.ssoProfileHostname}/signin/register`;
-  }
-
-  get ssoProfileLoginUrl() {
-    return this.ssoProfileHostname;
-  }
-
-  get ssoProfileSettingsUrl() {
-    return `${this.ssoProfileHostname}/profile`;
-  }
-
-  // Old function name - keep around until fully deprecated
-  getSettingsUrl() {
-    return `${this.ssoProfileHostname}/profile`;
-  }
-
   // Expected params:
   //  env
   //  client
@@ -82,209 +26,122 @@ class IdeoSSO {
     }
   }
 
+  get env() {
+    return this.opts.env || 'production';
+  }
+
+  get signInUrl() {
+    return this._routes.signInUrl;
+  }
+
+  get signUpUrl() {
+    return this._routes.signUpUrl;
+  }
+
+  get profileUrl() {
+    return this._routes.profileUrl;
+  }
+
+  // Legacy method that we're still supporting
+  getSettingsUrl() {
+    return this.profileUrl;
+  }
+
   signUp(email = null) {
-    // Auto-fill email if provided
-    let url = this.ssoProfileSignUpUrl + this._oauthQueryParams();
-    if (email) {
-      url += `&email=${encodeURIComponent(email)}`;
-    }
-    // Sign out user if they were signed in,
-    // and redirect to sign up with email (if given)
-    this.logout(url);
+    window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams(email)}`;
   }
 
   signIn(email = null) {
-    let url = `${this.ssoProfileHostname}/oauth${this._oauthQueryParams()}`;
-    if (email) {
-      url += `&email=${encodeURIComponent(email)}`;
-    }
-    window.location.href = url;
-  }
-
-  _oauthQueryParams() {
-    return `?client_id=${this.opts.client}` +
-           `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
-           `&state=${this.opts.state}`;
+    window.location.href = this._authorizeUrl(email);
   }
 
   logout(redirect = null) {
     return new Promise((resolve, reject) => {
-      // Logout OKTA JS
-      this.oktaAuth.signOut().finally(() => {
-        // Logout SSO Profile app
-        $.ajax({
-          url: this.logoutUrl,
-          cors: true,
-          withCredentials: true,
-          method: 'GET'
-        }).then(() => {
+      // Logout SSO Profile app
+      nanoajax.ajax({
+        url: this._routes.apiUserSessionDestroyUrl,
+        method: 'DELETE',
+        withCredentials: true,
+        cors: true
+      }, (code, response) => {
+        if (this._successfulAjaxStatus(code)) {
           if (redirect) {
             window.location.href = redirect;
           }
           resolve();
-        }, err => {
-          reject(err);
-        });
+        } else {
+          reject(response);
+        }
       });
     });
   }
 
-  _reviveSession() {
+  getUserInfo() {
     return new Promise((resolve, reject) => {
-      this.oktaAuth.session.get().then(res => {
-        if (res.status !== 'ACTIVE') {
-          return reject(new Error('Not logged in'));
+      nanoajax.ajax({
+        url: this._routes.apiUserUrl,
+        method: 'GET',
+        responseType: 'json',
+        withCredentials: true,
+        cors: true
+      }, (code, response) => {
+        if (this._successfulAjaxStatus(code)) {
+          resolve(response);
+        } else {
+          reject(response);
         }
-        this.oktaAuth.token.getWithoutPrompt().then(data => {
-          window.location.href = 'https://dev-744644.oktapreview.com/oauth2/v1/authorize?client_id=' +
-            this.opts.client + '&response_type=code&scope=openid+profile+email&prompt=none' +
-            '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
-            '&state=' + encodeURIComponent(this.opts.state);
-          // TODO: nonce + '&nonce=TODOn-0S6_WzA2Mj';
-          return data;
-        }).catch(() => {
-          this.oktaAuth.session.close();
-          return reject(new Error('Not logged in'));
-        });
-      }).catch(err => {
-        // Not logged in
-        console.info('Not logged in:', err);
-        return reject(new Error('Not logged in'));
       });
     });
   }
 
-  _renderSignIn(selector) {
-    this.oktaSignIn.renderEl(
-      {el: selector || '#osw-container'},
-      res => { // Success
-        // The properties in the response object depend on two factors:
-        // 1. The type of authentication flow that has just completed, determined by res.status
-        // 2. What type of token the widget is returning
-
-        // The user has started the password recovery flow, and is on the confirmation
-        // screen letting them know that an email is on the way.
-        if (res.status === 'FORGOT_PASSWORD_EMAIL_SENT') {
-          // Set cookie on SSO Profile app so we know where to
-          // redirect user back to from reset password link
-          this._saveForgotPasswordRedirect(window.location.href);
-
-          // If the user came in from a migration, we now mark the user as migrated
-          this._flagUserAsMigrated();
-          return;
-        }
-
-        // The user has started the unlock account flow, and is on the confirmation
-        // screen letting them know that an email is on the way.
-        if (res.status === 'UNLOCK_ACCOUNT_EMAIL_SENT') {
-          // Any followup action you want to take
-          return;
-        }
-
-        // TODO: This was necessary for the "SESSION" authScheme for self-registration
-        // The user has successfully completed the authentication flow
-        // if (res.status === 'SUCCESS') {
-        //   // SESSION response
-        //   // res.session.setCookieAndRedirect(this.opts.redirect);
-        //   window.location.href = `${this.oktaBaseUrl}/oauth2/v1/authorize?client_id=${this.opts.client}` +
-        //     '&response_type=code' +
-        //     '&scope=openid+profile+email' +
-        //     '&prompt=none' +
-        //     '&redirect_uri=' + encodeURIComponent(this.opts.redirect) +
-        //     `&state=${this.opts.state}` +
-        //     '&nonce=n-0S6_WzA2Mj' +
-        //     `&sessionToken=${res.session.token}`;
-        // }
-
-        if (res.status === 'SUCCESS') {
-          // OIDC response
-
-          // If the widget is configured for OIDC with a single responseType, the
-          // response will be the token.
-          // i.e. authParams.responseType = 'id_token':
-          // console.log(res);
-          // console.log(res.claims);
-          this.oktaSignIn.tokenManager.add('my_id_token', res);
-
-          // If the widget is configured for OIDC with multiple responseTypes, the
-          // response will be an array of tokens:
-          // i.e. authParams.responseType = ['id_token', 'token']
-          // signIn.tokenManager.add('my_id_token', res[0]);
-          // signIn.tokenManager.add('my_access_token', res[1]);
-        }
-      },
-      err => { // Error
-        // The widget will handle most types of errors - for example, if the user
-        // enters an invalid password or there are issues authenticating.
-        //
-        // This function is invoked with errors the widget cannot recover from:
-        // 1. Known errors: CONFIG_ERROR, UNSUPPORTED_BROWSER_ERROR, OAUTH_ERROR
-        // 2. Uncaught exceptions
-        console.warn(err);
-      }
-    );
-  }
-
-  _setupOktaAuth() {
-    this._oktaAuth = new OktaAuth({
-      url: this.oktaBaseUrl,
-      clientId: this.opts.client,
-      redirectUri: this.opts.redirect,
-      responseType: 'code',
-      state: this.opts.state
-    });
-
-    return this._oktaAuth;
-  }
-
-  _setupOktaSignIn() {
-    // Docs: https://github.com/okta/okta-signin-widget#new-oktasigninconfig
-    const params = {
-      baseUrl: this.oktaBaseUrl,
-      authParams: {
-        responseType: 'code',
-        state: this.opts.state,
-        scopes: ['openid', 'email', 'profile']
-      },
-      features: {
-        // TODO: There is a bug when router is turned on that the forgot password sucess page redirects immediately to ""
-        router: false,
-        registration: true,
-        rememberMe: true
-      },
-      clientId: this.opts.client,
-      redirectUri: this.opts.redirect,
-      processCreds: this._checkMigratedUser.bind(this),
-      idps: [
-        {type: 'FACEBOOK', id: '0oad2c6zwsKAF2aEy0h7'},
-        {type: 'GOOGLE', id: '0oacyjisdvanWuodH0h7'}
-      ],
-      idpDisplay: 'PRIMARY',
-      oAuthTimeout: 300000 // 5 minutes
-    };
-
-    if (this.opts.recoveryToken) {
-      params.recoveryToken = this.opts.recoveryToken;
+  // Private
+  get _routes() {
+    if (!this._ssoRoutesInstance) {
+      SSOAppRoutes.init({env: this.env});
+      this._ssoRoutesInstance = SSOAppRoutes;
     }
+    return this._ssoRoutesInstance;
+  }
 
-    this._oktaSignIn = new OktaSignIn(params);
+  _authorizeUrl(email = null) {
+    return `${this._routes.authorizeUrl}${this._oauthQueryParams(email)}`;
+  }
 
-    return this._oktaSignIn;
+  _oauthQueryParams(email) {
+    let url = `?client_id=${this.opts.client}` +
+              `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
+              `&response_type=code` +
+              `&state=${encodeURIComponent(this.opts.state)}`;
+    if (email) {
+      url += `&email=${encodeURIComponent(email)}`;
+    }
+    return url;
   }
 
   _setupStateCookie() {
-    this.opts.state = uuidv4();
-    // TODO: https only cookie
-    this._setCookie('State', this.opts.state, 2);
+    // Check if there is an existing cookie, if so use it.
+    if (this._getCookie('State')) {
+      this.opts.state = this._getCookie('State');
+    } else {
+      // Generate new state
+      this.opts.state = uuidv4();
+      // Save for 1 week
+      this._setCookie('State', this.opts.state, 24 * 7);
+    }
+  }
+
+  get _isHttps() {
+    return window.location.protocol === 'https';
   }
 
   _setCookie(key, value, expiresInHours = 1, domain = null) {
-    const opts = {expires: this._hoursFromNow(expiresInHours)};
-
+    const opts = {
+      expires: this._hoursFromNow(expiresInHours),
+      secure: this._isHttps
+    };
     if (domain) {
       opts.domain = domain;
     }
-
     return Cookies.set(`IdeoSSO-${key}`, value, opts);
   }
 
@@ -297,62 +154,8 @@ class IdeoSSO {
     return d.setTime(d.getTime() + (numHours * 60 * 60 * 1000));
   }
 
-  _flagUserAsMigrated() {
-    const email = this._getCookie('MigrationUser');
-    if (email) {
-      $.ajax(this.ssoProfileUserMigratedUrl, {
-        type: 'DELETE',
-        data: {email}
-      });
-    }
-  }
-
-  _setEmailInputValue(email) {
-    const container = $('#okta-target form');
-    container.find('input[name="username"]').val(email);
-    // Have to trigger a user-event on the input so that Okta's validation captures the value change
-    container.find('input[name="username"]').trigger($.Event('keydown', {which: 39})); // eslint-disable-line new-cap
-  }
-
-  _checkMigratedUser(creds, callback) {
-    $.get(this.ssoProfileUserMigratedUrl, {email: creds.username})
-      .done((data, status, xhr) => {
-        if (xhr.status === 200) {
-          $('a.js-forgot-password').trigger('click');
-          this._setCookie('MigrationUser', creds.username, 2);
-          setTimeout(() => {
-            const form = $('.forgot-password form');
-            form.find('h2.okta-form-title').hide();
-            this._setEmailInputValue(creds.username);
-            form.prepend([
-              $('<h2 class="okta-form-title o-form-head"></h2>').text('HELLO AGAIN!'),
-              $('<p class="fancy-body" align="center"></p>').text('We recently made a system update, which means you\'ll need to reset your password.')
-            ]);
-          }, 250);
-        } else {
-          callback();
-        }
-      }).fail(() => {
-        callback();
-      });
-  }
-
-  // Deprecated functionality - keeping until we determine if we need it
-  //
-  // Sets cookie so we can redirect user back to the app they used to initiate the password reset
-  //
-  // Notes:
-  // Safari needs a POST request to set a cross-domain cookie.
-  // IE8 and IE9 do not support setting cookies in cross-domain requests.
-
-  // URL used to set a forgot password redirect cookie
-  get ssoProfileSetRedirectUrl() {
-    return `${this.ssoProfileHostname}/cookies/forgot_password_redirect`;
-  }
-
-  _saveForgotPasswordRedirect(url) {
-    const saveRedirectUrl = `${this.ssoProfileSetRedirectUrl}?url=${encodeURIComponent(url)}`;
-    $.post(saveRedirectUrl);
+  _successfulAjaxStatus(code) {
+    return includes([200, 301, 302], code);
   }
 }
 
