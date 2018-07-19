@@ -42,6 +42,10 @@ class IdeoSSO {
     return this._routes.profileUrl;
   }
 
+  get baseApiUrl() {
+    return this._routes.baseApiUrl;
+  }
+
   // Legacy method that we're still supporting
   getSettingsUrl() {
     return this.profileUrl;
