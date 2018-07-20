@@ -5,10 +5,14 @@ class SSOAppRoutes {
 
   get hostname() {
     switch (this.env) {
-      case 'production': return 'https://profile.ideo.com';
-      case 'staging': return 'https://ideo-sso-profile-staging.herokuapp.com';
-      case 'local': return 'http://localhost:3000';
-      default: return null;
+      case 'production':
+        return 'https://profile.ideo.com';
+      case 'staging':
+        return 'https://ideo-sso-profile-staging.herokuapp.com';
+      case 'local':
+        return 'http://localhost:3000';
+      default:
+        return null;
     }
   }
 

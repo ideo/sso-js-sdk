@@ -7,10 +7,14 @@
     "build": "webpack --env build",
     "dev": "webpack --progress --colors --watch --env dev",
     "start": "npm run build && webpack-dev-server --env dev --color",
-    "deploy:production": "npm run build && aws s3 sync dist s3://ideo-sso/1.1/ --profile ideo-sso --cache-control max-age=3600 --exclude '*.html' --exclude '*.map' --exclude '.DS_Store' && aws cloudfront create-invalidation --distribution-id E3P1EIEE9327TY --invalidation-batch \"Paths={Quantity=1,Items=[/*]},CallerReference=$(date +%s)\" --profile ideo-sso",
-    "deploy:staging": "npm run build && aws s3 sync dist s3://ideo-sso-staging/1.1/ --profile ideo-sso --cache-control max-age=3600 --exclude '*.html' --exclude '*.map' --exclude '.DS_Store' && aws cloudfront create-invalidation --distribution-id E3ICOAG9OCZWDX --invalidation-batch \"Paths={Quantity=1,Items=[/*]},CallerReference=$(date +%s)\" --profile ideo-sso",
-    "test": "mocha --compilers js:babel-core/register --colors ./test/*.spec.js",
-    "test:watch": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js",
+    "deploy:production":
+      "npm run build && aws s3 sync dist s3://ideo-sso/1.1/ --profile ideo-sso --cache-control max-age=3600 --exclude '*.html' --exclude '*.map' --exclude '.DS_Store' && aws cloudfront create-invalidation --distribution-id E3P1EIEE9327TY --invalidation-batch \"Paths={Quantity=1,Items=[/*]},CallerReference=$(date +%s)\" --profile ideo-sso",
+    "deploy:staging":
+      "npm run build && aws s3 sync dist s3://ideo-sso-staging/1.1/ --profile ideo-sso --cache-control max-age=3600 --exclude '*.html' --exclude '*.map' --exclude '.DS_Store' && aws cloudfront create-invalidation --distribution-id E3ICOAG9OCZWDX --invalidation-batch \"Paths={Quantity=1,Items=[/*]},CallerReference=$(date +%s)\" --profile ideo-sso",
+    "test":
+      "mocha --compilers js:babel-core/register --colors ./test/*.spec.js",
+    "test:watch":
+      "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js",
     "eslint-find-option-rules": "eslint-find-rules -c .eslintrc",
     "eslint": "eslint src/index.js"
   },

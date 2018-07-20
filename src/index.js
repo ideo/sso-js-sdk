@@ -18,9 +18,13 @@ class IdeoSSO {
   //  recoveryToken
 
   init(opts = {}) {
-    this.opts = merge({}, {
-      env: 'production'
-    }, opts);
+    this.opts = merge(
+      {},
+      {
+        env: 'production'
+      },
+      opts
+    );
     if (!this.opts.state) {
       this._setupStateCookie();
     }
@@ -52,7 +56,9 @@ class IdeoSSO {
   }
 
   signUp(email = null) {
-    window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams(email)}`;
+    window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams(
+      email
+    )}`;
   }
 
   signIn(email = null) {
@@ -62,39 +68,45 @@ class IdeoSSO {
   logout(redirect = null) {
     return new Promise((resolve, reject) => {
       // Logout SSO Profile app
-      nanoajax.ajax({
-        url: this._routes.apiUserSessionDestroyUrl,
-        method: 'DELETE',
-        withCredentials: true,
-        cors: true
-      }, (code, response) => {
-        if (this._successfulAjaxStatus(code)) {
-          if (redirect) {
-            window.location.href = redirect;
+      nanoajax.ajax(
+        {
+          url: this._routes.apiUserSessionDestroyUrl,
+          method: 'DELETE',
+          withCredentials: true,
+          cors: true
+        },
+        (code, response) => {
+          if (this._successfulAjaxStatus(code)) {
+            if (redirect) {
+              window.location.href = redirect;
+            }
+            resolve();
+          } else {
+            reject(response);
           }
-          resolve();
-        } else {
-          reject(response);
         }
-      });
+      );
     });
   }
 
   getUserInfo() {
     return new Promise((resolve, reject) => {
-      nanoajax.ajax({
-        url: this._routes.apiUserUrl,
-        method: 'GET',
-        responseType: 'json',
-        withCredentials: true,
-        cors: true
-      }, (code, response) => {
-        if (this._successfulAjaxStatus(code)) {
-          resolve(response);
-        } else {
-          reject(response);
+      nanoajax.ajax(
+        {
+          url: this._routes.apiUserUrl,
+          method: 'GET',
+          responseType: 'json',
+          withCredentials: true,
+          cors: true
+        },
+        (code, response) => {
+          if (this._successfulAjaxStatus(code)) {
+            resolve(response);
+          } else {
+            reject(response);
+          }
         }
-      });
+      );
     });
   }
 
@@ -112,10 +124,11 @@ class IdeoSSO {
   }
 
   _oauthQueryParams(email) {
-    let url = `?client_id=${this.opts.client}` +
-              `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
-              `&response_type=code` +
-              `&state=${encodeURIComponent(this.opts.state)}`;
+    let url =
+      `?client_id=${this.opts.client}` +
+      `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
+      `&response_type=code` +
+      `&state=${encodeURIComponent(this.opts.state)}`;
     if (email) {
       url += `&email=${encodeURIComponent(email)}`;
     }
@@ -155,7 +168,8 @@ class IdeoSSO {
 
   _hoursFromNow(numHours) {
     const d = new Date();
-    return d.setTime(d.getTime() + (numHours * 60 * 60 * 1000));
+    const milliseconds = numHours * 60 * 60 * 1000;
+    return d.setTime(d.getTime() + milliseconds);
   }
 
   _successfulAjaxStatus(code) {
