@@ -2,7 +2,7 @@
 
 This repository is the source driving the client-side of IDEO's Network Tool SSO account system.
 
-You'll find [usage instructions in our wiki](https://github.com/ideo/ideo-products/wiki/Ideo-SSO#2-add-the-js-sdk).
+You'll find [usage instructions in our wiki](https://github.com/ideo/ideo-products/wiki/Integrating-Ideo-SSO).
 
 # Developing the SDK
 
