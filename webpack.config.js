@@ -5,7 +5,6 @@ const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const path = require('path');
 const env = require('yargs').argv.env;
 
-const libraryName = 'IdeoSSO';
 const fileName = `ideo-sso-js-sdk${env === 'build' ? '.min' : ''}`;
 
 const plugins = [];
@@ -25,8 +24,7 @@ const config = {
   output: {
     path: path.join(__dirname, 'dist'),
     filename: `js/${fileName}.js`,
-    library: libraryName,
-    libraryTarget: 'var'
+    libraryTarget: 'umd'
   },
   module: {
     rules: [

@@ -11,11 +11,12 @@ import SSOAppRoutes from 'sso_app_routes';
 promiseFinallyShim.shim();
 
 class IdeoSSO {
-  // Expected params:
+  // Optional params:
   //  env
   //  client
   //  redirect
   //  recoveryToken
+  //  ssoHostname
 
   init(opts = {}) {
     this.opts = merge(
