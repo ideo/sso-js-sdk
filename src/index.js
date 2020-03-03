@@ -34,6 +34,10 @@ class IdeoSSO {
     return this.opts.env || 'production';
   }
 
+  get ssoHostname() {
+    return this.opts.ssoHostname;
+  }
+
   get signInUrl() {
     return this._routes.signInUrl;
   }
@@ -58,6 +62,13 @@ class IdeoSSO {
   signUp(email = null) {
     window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams(
       email
+    )}`;
+  }
+
+  signUpWithToken(token = null) {
+    window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams(
+      null,
+      token
     )}`;
   }
 
@@ -113,7 +124,7 @@ class IdeoSSO {
   // Private
   get _routes() {
     if (!this._ssoRoutesInstance) {
-      SSOAppRoutes.init({env: this.env});
+      SSOAppRoutes.init({env: this.env, ssoHostname: this.ssoHostname});
       this._ssoRoutesInstance = SSOAppRoutes;
     }
     return this._ssoRoutesInstance;
@@ -123,7 +134,7 @@ class IdeoSSO {
     return `${this._routes.authorizeUrl}${this._oauthQueryParams(email)}`;
   }
 
-  _oauthQueryParams(email) {
+  _oauthQueryParams(email, token = null) {
     let url =
       `?client_id=${this.opts.client}` +
       `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
@@ -131,6 +142,9 @@ class IdeoSSO {
       `&state=${encodeURIComponent(this.opts.state)}`;
     if (email) {
       url += `&email=${encodeURIComponent(email)}`;
+    }
+    if (token) {
+      url += `&token=${encodeURIComponent(token)}`;
     }
     return url;
   }

@@ -1,9 +1,15 @@
 class SSOAppRoutes {
   init(opts = {}) {
     this.env = opts.env || 'production';
+    if (opts.ssoHostname) {
+      this.ssoHostname = opts.ssoHostname;
+    }
   }
 
   get hostname() {
+    if (this.ssoHostname) {
+      return this.ssoHostname;
+    }
     switch (this.env) {
       case 'production':
         return 'https://profile.ideo.com';
