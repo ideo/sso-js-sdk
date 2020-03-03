@@ -1,5 +1,14 @@
-var IdeoSSO =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -4960,11 +4969,12 @@ var IdeoSSO = function () {
   _createClass(IdeoSSO, [{
     key: 'init',
 
-    // Expected params:
+    // Optional params:
     //  env
     //  client
     //  redirect
     //  recoveryToken
+    //  ssoHostname
 
     value: function init() {
       var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -4990,6 +5000,13 @@ var IdeoSSO = function () {
       var email = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
       window.location.href = '' + this._routes.signUpUrl + this._oauthQueryParams(email);
+    }
+  }, {
+    key: 'signUpWithToken',
+    value: function signUpWithToken() {
+      var token = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      window.location.href = '' + this._routes.signUpUrl + this._oauthQueryParams(null, token);
     }
   }, {
     key: 'signIn',
@@ -5058,9 +5075,14 @@ var IdeoSSO = function () {
   }, {
     key: '_oauthQueryParams',
     value: function _oauthQueryParams(email) {
+      var token = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
       var url = '?client_id=' + this.opts.client + ('&redirect_uri=' + encodeURIComponent(this.opts.redirect)) + '&response_type=code' + ('&state=' + encodeURIComponent(this.opts.state));
       if (email) {
         url += '&email=' + encodeURIComponent(email);
+      }
+      if (token) {
+        url += '&token=' + encodeURIComponent(token);
       }
       return url;
     }
@@ -5115,6 +5137,11 @@ var IdeoSSO = function () {
       return this.opts.env || 'production';
     }
   }, {
+    key: 'ssoHostname',
+    get: function get() {
+      return this.opts.ssoHostname;
+    }
+  }, {
     key: 'signInUrl',
     get: function get() {
       return this._routes.signInUrl;
@@ -5138,7 +5165,7 @@ var IdeoSSO = function () {
     key: '_routes',
     get: function get() {
       if (!this._ssoRoutesInstance) {
-        _sso_app_routes2.default.init({ env: this.env });
+        _sso_app_routes2.default.init({ env: this.env, ssoHostname: this.ssoHostname });
         this._ssoRoutesInstance = _sso_app_routes2.default;
       }
       return this._ssoRoutesInstance;
@@ -14932,17 +14959,23 @@ var SSOAppRoutes = function () {
       var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
       this.env = opts.env || 'production';
+      if (opts.ssoHostname) {
+        this.ssoHostname = opts.ssoHostname;
+      }
     }
   }, {
     key: 'hostname',
     get: function get() {
+      if (this.ssoHostname) {
+        return this.ssoHostname;
+      }
       switch (this.env) {
         case 'production':
           return 'https://profile.ideo.com';
         case 'staging':
           return 'https://ideo-sso-profile-staging.herokuapp.com';
         case 'local':
-          return 'http://localhost:3001';
+          return 'http://localhost:3000';
         default:
           return null;
       }
@@ -15010,4 +15043,5 @@ module.exports = exports['default'];
 
 /***/ })
 /******/ ]);
+});
 //# sourceMappingURL=ideo-sso-js-sdk.js.map
