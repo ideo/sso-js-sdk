@@ -31,6 +31,25 @@ class IdeoSSO {
     }
   }
 
+  initFromEnv(env = {}) {
+    const {
+      IDEO_SSO_HOST,
+      IDEO_SSO_CLIENT_ID,
+      BASE_HOST,
+      IDEO_SSO_REDIRECT_PATH
+    } = env;
+
+    let redirect;
+    if (BASE_HOST && IDEO_SSO_REDIRECT_PATH) {
+      redirect = `${BASE_HOST}${IDEO_SSO_REDIRECT_PATH}`;
+    }
+    this.init({
+      ssoHostname: IDEO_SSO_HOST,
+      client: IDEO_SSO_CLIENT_ID,
+      redirect
+    });
+  }
+
   get env() {
     return this.opts.env || 'production';
   }
@@ -60,20 +79,14 @@ class IdeoSSO {
     return this.profileUrl;
   }
 
-  signUp(email = null) {
+  signUp({email = null, token = null} = {}) {
     window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams(
-      email
-    )}`;
-  }
-
-  signUpWithToken(token = null) {
-    window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams(
-      null,
+      email,
       token
     )}`;
   }
 
-  signIn(email = null) {
+  signIn({email = null} = {}) {
     window.location.href = this._authorizeUrl(email);
   }
 

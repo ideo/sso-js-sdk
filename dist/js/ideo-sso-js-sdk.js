@@ -4987,6 +4987,26 @@ var IdeoSSO = function () {
       }
     }
   }, {
+    key: 'initFromEnv',
+    value: function initFromEnv() {
+      var env = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var IDEO_SSO_HOST = env.IDEO_SSO_HOST,
+          IDEO_SSO_CLIENT_ID = env.IDEO_SSO_CLIENT_ID,
+          BASE_HOST = env.BASE_HOST,
+          IDEO_SSO_REDIRECT_PATH = env.IDEO_SSO_REDIRECT_PATH;
+
+
+      var redirect = void 0;
+      if (BASE_HOST && IDEO_SSO_REDIRECT_PATH) {
+        redirect = '' + BASE_HOST + IDEO_SSO_REDIRECT_PATH;
+      }
+      this.init({
+        ssoHostname: IDEO_SSO_HOST,
+        client: IDEO_SSO_CLIENT_ID,
+        redirect: redirect
+      });
+    }
+  }, {
     key: 'getSettingsUrl',
 
 
@@ -4997,21 +5017,20 @@ var IdeoSSO = function () {
   }, {
     key: 'signUp',
     value: function signUp() {
-      var email = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+          _ref$email = _ref.email,
+          email = _ref$email === undefined ? null : _ref$email,
+          _ref$token = _ref.token,
+          token = _ref$token === undefined ? null : _ref$token;
 
-      window.location.href = '' + this._routes.signUpUrl + this._oauthQueryParams(email);
-    }
-  }, {
-    key: 'signUpWithToken',
-    value: function signUpWithToken() {
-      var token = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-      window.location.href = '' + this._routes.signUpUrl + this._oauthQueryParams(null, token);
+      window.location.href = '' + this._routes.signUpUrl + this._oauthQueryParams(email, token);
     }
   }, {
     key: 'signIn',
     value: function signIn() {
-      var email = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+          _ref2$email = _ref2.email,
+          email = _ref2$email === undefined ? null : _ref2$email;
 
       window.location.href = this._authorizeUrl(email);
     }
