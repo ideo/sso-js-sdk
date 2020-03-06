@@ -79,15 +79,16 @@ class IdeoSSO {
     return this.profileUrl;
   }
 
-  signUp({email = null, token = null} = {}) {
-    window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams(
+  signUp({email = null, token = null, confirmationRedirectUri = null} = {}) {
+    window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams({
       email,
-      token
-    )}`;
+      token,
+      confirmationRedirectUri
+    })}`;
   }
 
-  signIn({email = null} = {}) {
-    window.location.href = this._authorizeUrl(email);
+  signIn({email = null, confirmationRedirectUri = null} = {}) {
+    window.location.href = this._authorizeUrl({email, confirmationRedirectUri});
   }
 
   logout(redirect = null) {
@@ -144,11 +145,11 @@ class IdeoSSO {
     return this._ssoRoutesInstance;
   }
 
-  _authorizeUrl(email = null) {
-    return `${this._routes.authorizeUrl}${this._oauthQueryParams(email)}`;
+  _authorizeUrl(opts = {}) {
+    return `${this._routes.authorizeUrl}${this._oauthQueryParams(opts)}`;
   }
 
-  _oauthQueryParams(email, token = null) {
+  _oauthQueryParams({email, token = null, confirmationRedirectUri = null} = {}) {
     let url =
       `?client_id=${this.opts.client}` +
       `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
@@ -159,6 +160,9 @@ class IdeoSSO {
     }
     if (token) {
       url += `&token=${encodeURIComponent(token)}`;
+    }
+    if (confirmationRedirectUri) {
+      url += `&confirmation_redirect_uri=${encodeURIComponent(confirmationRedirectUri)}`;
     }
     return url;
   }

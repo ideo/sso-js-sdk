@@ -5021,18 +5021,26 @@ var IdeoSSO = function () {
           _ref$email = _ref.email,
           email = _ref$email === undefined ? null : _ref$email,
           _ref$token = _ref.token,
-          token = _ref$token === undefined ? null : _ref$token;
+          token = _ref$token === undefined ? null : _ref$token,
+          _ref$confirmationRedi = _ref.confirmationRedirectUri,
+          confirmationRedirectUri = _ref$confirmationRedi === undefined ? null : _ref$confirmationRedi;
 
-      window.location.href = '' + this._routes.signUpUrl + this._oauthQueryParams(email, token);
+      window.location.href = '' + this._routes.signUpUrl + this._oauthQueryParams({
+        email: email,
+        token: token,
+        confirmationRedirectUri: confirmationRedirectUri
+      });
     }
   }, {
     key: 'signIn',
     value: function signIn() {
       var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
           _ref2$email = _ref2.email,
-          email = _ref2$email === undefined ? null : _ref2$email;
+          email = _ref2$email === undefined ? null : _ref2$email,
+          _ref2$confirmationRed = _ref2.confirmationRedirectUri,
+          confirmationRedirectUri = _ref2$confirmationRed === undefined ? null : _ref2$confirmationRed;
 
-      window.location.href = this._authorizeUrl(email);
+      window.location.href = this._authorizeUrl({ email: email, confirmationRedirectUri: confirmationRedirectUri });
     }
   }, {
     key: 'logout',
@@ -5087,14 +5095,19 @@ var IdeoSSO = function () {
   }, {
     key: '_authorizeUrl',
     value: function _authorizeUrl() {
-      var email = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-      return '' + this._routes.authorizeUrl + this._oauthQueryParams(email);
+      return '' + this._routes.authorizeUrl + this._oauthQueryParams(opts);
     }
   }, {
     key: '_oauthQueryParams',
-    value: function _oauthQueryParams(email) {
-      var token = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    value: function _oauthQueryParams() {
+      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+          email = _ref3.email,
+          _ref3$token = _ref3.token,
+          token = _ref3$token === undefined ? null : _ref3$token,
+          _ref3$confirmationRed = _ref3.confirmationRedirectUri,
+          confirmationRedirectUri = _ref3$confirmationRed === undefined ? null : _ref3$confirmationRed;
 
       var url = '?client_id=' + this.opts.client + ('&redirect_uri=' + encodeURIComponent(this.opts.redirect)) + '&response_type=code' + ('&state=' + encodeURIComponent(this.opts.state));
       if (email) {
@@ -5102,6 +5115,9 @@ var IdeoSSO = function () {
       }
       if (token) {
         url += '&token=' + encodeURIComponent(token);
+      }
+      if (confirmationRedirectUri) {
+        url += '&confirmation_redirect_uri=' + encodeURIComponent(confirmationRedirectUri);
       }
       return url;
     }
