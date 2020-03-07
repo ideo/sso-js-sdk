@@ -16,6 +16,6 @@ You'll find [usage instructions in our wiki](https://github.com/ideo/ideo-produc
 1. `npm start` (will build and then run webpack-dev-server)
 2. Scripts will be available for use on http://localhost:9000 (e.g. http://localhost:9000/js/ideo-sso-js-sdk.js)
 
-## Adding this module to your project's node_modules
+## Usage
 1. `yarn add ideo/sso-js-sdk` or `npm install ideo/sso-js-sdk`
 2. or in your `package.json` add `"ideo-sso-js-sdk": "ideo/sso-js-sdk"`, then run `yarn` or `npm install`
