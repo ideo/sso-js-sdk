@@ -1,3 +1,4 @@
+/** Class representing various authentication/authorization routes */
 class SSOAppRoutes {
   init(opts = {}) {
     this.env = opts.env || 'production';

@@ -28,6 +28,10 @@ aws configure --profile ideo-sso
 1. `npm start` (will build and then run webpack-dev-server)
 2. Scripts will be available for use on http://localhost:9000 (e.g. http://localhost:9000/js/ideo-sso-js-sdk.js)
 
+## Docs
+1. `yarn docs`
+2. `open docs/index.html`
+
 ## Deployment
 
 Build & deploy to the S3 environment:

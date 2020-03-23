@@ -17,7 +17,11 @@
     "sinon": true
   },
   "parser": "babel-eslint",
+  "plugins": [
+      "jsdoc"
+  ],
   "extends": [
-    "xo-space/esnext"
+    "xo-space/esnext",
+    "plugin:jsdoc/recommended",
   ]
 }

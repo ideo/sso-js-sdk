@@ -10,14 +10,8 @@ import SSOAppRoutes from 'sso_app_routes';
 
 promiseFinallyShim.shim();
 
+/** Class representing IdeoSSO js SDK */
 class IdeoSSO {
-  // Optional params:
-  //  env
-  //  client
-  //  redirect
-  //  recoveryToken
-  //  ssoHostname
-
   init(opts = {}) {
     this.opts = merge(
       {},
@@ -50,22 +44,37 @@ class IdeoSSO {
     });
   }
 
+  /**
+   * @returns {string} the env provided during init
+   */
   get env() {
     return this.opts.env || 'production';
   }
 
+  /**
+   * @returns {string} the ssoHostname provided during init
+   */
   get ssoHostname() {
     return this.opts.ssoHostname;
   }
 
+  /**
+   * @returns {string} where users can log in
+   */
   get signInUrl() {
     return this._routes.signInUrl;
   }
 
+  /**
+   * @returns {string} where users can register for a new account
+   */
   get signUpUrl() {
     return this._routes.signUpUrl;
   }
 
+  /**
+   * @returns {string} the profile page & settings URL
+   */
   get profileUrl() {
     return this._routes.profileUrl;
   }
@@ -74,11 +83,26 @@ class IdeoSSO {
     return this._routes.baseApiUrl;
   }
 
-  // Legacy method that we're still supporting
+  /**
+   * Legacy method
+   *
+   * @see {@link profileUrl}
+   * @returns the profile page & settings URL
+   */
   getSettingsUrl() {
     return this.profileUrl;
   }
 
+  /**
+   * Redirect a user to the SSO sign up page.
+   * An authenticated user will be returned to your callback URL per the oAuth flow.
+   * If you'd like to ensure the user is logged out (if they had a session), use IdeoSSO.logout() first, which returns a promise.
+   *
+   * @param {object} signUpParams sign up params
+   * @param {string} signUpParams.email - address that you'd like to pre-populate the form with
+   * @param {string} signUpParams.token - Network tool's generated invitation token
+   * @param {string} signUpParams.confirmationRedirectUri - where the client will be redirected to after confirmation
+   */
   signUp({email = null, token = null, confirmationRedirectUri = null} = {}) {
     window.location.href = `${this._routes.signUpUrl}${this._oauthQueryParams({
       email,
@@ -87,10 +111,25 @@ class IdeoSSO {
     })}`;
   }
 
+  /**
+   * Redirect a user into the network tool's authorization flow.
+   * An authenticated user will be returned to your callback URL per the oAuth flow.
+   *
+   * @param {object} signInParams sign in params
+   * @param {string} signInParams.email - address that you'd like to pre-populate the form with
+   * @param {string} signInParams.confirmationRedirectUri - where the client will be redirected to after confirmation
+   */
   signIn({email = null, confirmationRedirectUri = null} = {}) {
     window.location.href = this._authorizeUrl({email, confirmationRedirectUri});
   }
 
+  /**
+   * Redirect a user into the network tool's authorization flow.
+   * An authenticated user will be returned to your callback URL per the oAuth flow.
+   *
+   * @param {string} redirect where the client will be redirected to logging out
+   * @returns {Promise} Promise object with call to destroy user session
+   */
   logout(redirect = null) {
     return new Promise((resolve, reject) => {
       // Logout SSO Profile app
@@ -115,6 +154,11 @@ class IdeoSSO {
     });
   }
 
+  /**
+   * Get a JSON representation of the currently-logged in user
+   *
+   * @returns {Promise} Promise object with call to get user info
+   */
   getUserInfo() {
     return new Promise((resolve, reject) => {
       nanoajax.ajax(
@@ -136,7 +180,6 @@ class IdeoSSO {
     });
   }
 
-  // Private
   get _routes() {
     if (!this._ssoRoutesInstance) {
       SSOAppRoutes.init({env: this.env, ssoHostname: this.ssoHostname});
