@@ -1,4 +1,5 @@
-import 'babel-polyfill';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import uuidv4 from 'uuid/v4';
 import includes from 'lodash/includes';
 import merge from 'lodash/merge';
