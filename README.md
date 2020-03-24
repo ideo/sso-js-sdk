@@ -22,21 +22,4 @@ This repository is the source driving the client-side of IDEO's Network Tool SSO
 2. `open docs/index.html`
 
 ## Usage
-```js
-import IdeoSSO from 'ideo-sso-js-sdk
-
-
-/**
- * Initializes the module
- *
- * @param {object} opts init params
- * @param {string} opts.env sso-profile environment
- * @param {string} opts.client client_id of the authenticating app
- * @param {string} opts.redirect redirect_url of the authenticating app
- * @param {string} opts.ssoHostname sso-file host
- */
-
-IdeoSSO.init({ env, client, redirect, ssoHostname })
-```
-
 You'll find [usage instructions in our wiki](https://github.com/ideo/ideo-products/wiki/Integrating-Ideo-SSO).

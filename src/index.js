@@ -10,7 +10,7 @@ import SSOAppRoutes from 'sso_app_routes';
 
 promiseFinallyShim.shim();
 
-/** SDK module responsible for driving the client-side of IDEO's Network Tool SSO account system */
+/** @classdesc SDK module responsible for driving the client-side of IDEO's Network Tool SSO account system */
 class IdeoSSO {
   /**
    * Initializes the module
@@ -36,7 +36,15 @@ class IdeoSSO {
 
   /**
    * Initializes the module from using environment configs
-   * ie: IDEO_SSO_HOST: process.env.IDEO_SSO_HOST
+   *
+   * @example
+   * // initializes the app based on environment config
+   * IdeoSSO.initFromEnv({
+   *  IDEO_SSO_HOST: process.env.IDEO_SSO_HOST,
+   *  IDEO_SSO_CLIENT_ID: process.env.IDEO_SSO_CLIENT_ID,
+   *  BASE_HOST: process.env.BASE_HOST,
+   *  IDEO_SSO_REDIRECT_PATH: process.env.IDEO_SSO_REDIRECT_PATH
+   * })
    *
    * @param {object} env init params
    * @param {string} env.IDEO_SSO_HOST sso-profile host
@@ -98,14 +106,17 @@ class IdeoSSO {
     return this._routes.profileUrl;
   }
 
+  /**
+   * @returns {string} the base api url of the Network Tool
+   */
   get baseApiUrl() {
     return this._routes.baseApiUrl;
   }
 
   /**
-   * Legacy method
+   * @deprecated Legacy method which returns the profileUrl
    *
-   * @see {@link profileUrl}
+   * @see {@link IdeoSSO#profileUrl}
    * @returns the profile page & settings URL
    */
   getSettingsUrl() {
@@ -116,6 +127,8 @@ class IdeoSSO {
    * Redirect a user to the SSO sign up page.
    * An authenticated user will be returned to your callback URL per the oAuth flow.
    * If you'd like to ensure the user is logged out (if they had a session), use IdeoSSO.logout() first, which returns a promise.
+   *
+   * @see IdeoSSO#logout
    *
    * @param {object} signUpParams sign up params
    * @param {string} signUpParams.email - address that you'd like to pre-populate the form with
@@ -146,6 +159,7 @@ class IdeoSSO {
    * Redirect a user into the network tool's authorization flow.
    * An authenticated user will be returned to your callback URL per the oAuth flow.
    *
+   * @async
    * @param {string} redirect where the client will be redirected to logging out
    * @returns {Promise} Promise object with call to destroy user session
    */
@@ -176,6 +190,7 @@ class IdeoSSO {
   /**
    * Get a JSON representation of the currently-logged in user
    *
+   * @async
    * @returns {Promise} Promise object with call to get user info
    */
   getUserInfo() {
