@@ -10,8 +10,17 @@ import SSOAppRoutes from 'sso_app_routes';
 
 promiseFinallyShim.shim();
 
-/** Class representing IdeoSSO js SDK */
+/** SDK module responsible for driving the client-side of IDEO's Network Tool SSO account system */
 class IdeoSSO {
+  /**
+   * Initializes the module
+   *
+   * @param {object} opts init params
+   * @param {string} opts.env sso-profile environment
+   * @param {string} opts.client client_id of the authenticating app
+   * @param {string} opts.redirect redirect_url of the authenticating app
+   * @param {string} opts.ssoHostname sso-file host
+   */
   init(opts = {}) {
     this.opts = merge(
       {},
@@ -25,6 +34,17 @@ class IdeoSSO {
     }
   }
 
+  /**
+   * Initializes the module from using environment configs
+   * ie: IDEO_SSO_HOST: process.env.IDEO_SSO_HOST
+   *
+   * @param {object} opts init params
+   * @param {string} opts.IDEO_SSO_HOST sso-profile host
+   * @param {string} opts.IDEO_SSO_CLIENT_ID client_id of the authenticating app
+   * @param {string} opts.BASE_HOST base host of the authenticating app
+   * @param env
+   * @param {string} opts.IDEO_SSO_REDIRECT_PATH redirect_url of the authenticating app
+   */
   initFromEnv(env = {}) {
     const {
       IDEO_SSO_HOST,

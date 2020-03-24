@@ -1,8 +1,5 @@
 # SSO JavaScript SDK
-
 This repository is the source driving the client-side of IDEO's Network Tool SSO account system.
-
-You'll find [usage instructions in our wiki](https://github.com/ideo/ideo-products/wiki/Integrating-Ideo-SSO).
 
 # Developing the SDK
 
@@ -31,11 +28,15 @@ import IdeoSSO from 'ideo-sso-js-sdk
 
 /**
  * Initializes the module
- * @param {string} env - sso-profile environment
- * @param {string} client - client_id of the authenticating app
- * @param {string} redirect - redirect_url of the authenticating app
- * @param {string} ssoHostname - sso-file host
+ *
+ * @param {object} opts init params
+ * @param {string} opts.env sso-profile environment
+ * @param {string} opts.client client_id of the authenticating app
+ * @param {string} opts.redirect redirect_url of the authenticating app
+ * @param {string} opts.ssoHostname sso-file host
  */
 
 IdeoSSO.init({ env, client, redirect, ssoHostname })
 ```
+
+You'll find [usage instructions in our wiki](https://github.com/ideo/ideo-products/wiki/Integrating-Ideo-SSO).
