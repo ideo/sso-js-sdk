@@ -38,12 +38,11 @@ class IdeoSSO {
    * Initializes the module from using environment configs
    * ie: IDEO_SSO_HOST: process.env.IDEO_SSO_HOST
    *
-   * @param {object} opts init params
-   * @param {string} opts.IDEO_SSO_HOST sso-profile host
-   * @param {string} opts.IDEO_SSO_CLIENT_ID client_id of the authenticating app
-   * @param {string} opts.BASE_HOST base host of the authenticating app
-   * @param env
-   * @param {string} opts.IDEO_SSO_REDIRECT_PATH redirect_url of the authenticating app
+   * @param {object} env init params
+   * @param {string} env.IDEO_SSO_HOST sso-profile host
+   * @param {string} env.IDEO_SSO_CLIENT_ID client_id of the authenticating app
+   * @param {string} env.BASE_HOST base host of the authenticating app
+   * @param {string} env.IDEO_SSO_REDIRECT_PATH redirect_url of the authenticating app
    */
   initFromEnv(env = {}) {
     const {
