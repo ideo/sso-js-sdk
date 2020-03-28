@@ -187,14 +187,15 @@ class IdeoSSO {
   }
 
   get _isHttps() {
-    return window.location.protocol === 'https';
+    // Can be 'https' or 'https:'
+    return window.location.protocol.indexOf('https') === 0;
   }
 
   _setCookie(key, value, expiresInHours = 1, domain = null) {
     const opts = {
       expires: this._hoursFromNow(expiresInHours),
       secure: this._isHttps,
-      sameSite: 'lax' // Allows sending cookie in cross-domain requests
+      sameSite: 'Strict' // Prevents sending cookie in cross-domain requests
     };
     if (domain) {
       opts.domain = domain;

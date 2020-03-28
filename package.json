@@ -1,6 +1,6 @@
 {
   "name": "ideo-sso-js-sdk",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Library for using IDEO SSO",
   "main": "dist/js/ideo-sso-js-sdk.js",
   "scripts": {

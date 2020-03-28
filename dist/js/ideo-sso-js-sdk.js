@@ -6591,7 +6591,7 @@ var IdeoSSO = function () {
       var opts = {
         expires: this._hoursFromNow(expiresInHours),
         secure: this._isHttps,
-        sameSite: 'lax' // Allows sending cookie in cross-domain requests
+        sameSite: 'Strict' // Prevents sending cookie in cross-domain requests
       };
       if (domain) {
         opts.domain = domain;
@@ -6657,7 +6657,8 @@ var IdeoSSO = function () {
   }, {
     key: '_isHttps',
     get: function get() {
-      return window.location.protocol === 'https';
+      // Can be 'https' or 'https:'
+      return window.location.protocol.indexOf('https') === 0;
     }
   }]);
 
