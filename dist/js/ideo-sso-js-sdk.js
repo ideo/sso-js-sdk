@@ -6590,7 +6590,8 @@ var IdeoSSO = function () {
 
       var opts = {
         expires: this._hoursFromNow(expiresInHours),
-        secure: this._isHttps
+        secure: this._isHttps,
+        sameSite: 'lax' // Allows sending cookie in cross-domain requests
       };
       if (domain) {
         opts.domain = domain;
