@@ -195,7 +195,7 @@ class IdeoSSO {
     const opts = {
       expires: this._hoursFromNow(expiresInHours),
       secure: this._isHttps,
-      sameSite: 'Strict' // Prevents sending cookie in cross-domain requests
+      sameSite: 'Lax'
     };
     if (domain) {
       opts.domain = domain;
