@@ -12,7 +12,8 @@
     "test": "mocha --compilers js:babel-core/register --colors ./test/*.spec.js",
     "test:watch": "mocha --compilers js:babel-core/register --colors -w ./test/*.spec.js",
     "eslint-find-option-rules": "eslint-find-rules -c .eslintrc",
-    "eslint": "eslint src/index.js"
+    "eslint": "eslint src/index.js",
+    "docs": "jsdoc -c ./jsdoc.json"
   },
   "devDependencies": {
     "babel-cli": "~6.24.1",
@@ -22,10 +23,11 @@
     "babel-plugin-add-module-exports": "~0.2.1",
     "babel-preset-es2015": "~6.24.1",
     "chai": "~3.5.0",
-    "eslint": "~4.11.0",
+    "eslint": "^6.8.0",
     "eslint-config-xo-space": "~0.17.0",
     "eslint-find-rules": "^3.1.1",
     "eslint-loader": "~1.9.0",
+    "eslint-plugin-jsdoc": "^22.1.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "mocha": "~3.3.0",
     "style-loader": "~0.19.0",
@@ -45,6 +47,7 @@
   "dependencies": {
     "core-js": "^3.1.3",
     "js-cookie": "^2.2.0",
+    "jsdoc": "^3.6.3",
     "lodash": "^4.17.4",
     "nanoajax": "^0.4.3",
     "promise.prototype.finally": "^3.1.0",
