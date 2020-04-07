@@ -1,4 +1,5 @@
-import 'babel-polyfill';
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';
 import uuidv4 from 'uuid/v4';
 import includes from 'lodash/includes';
 import merge from 'lodash/merge';
@@ -226,7 +227,11 @@ class IdeoSSO {
     return `${this._routes.authorizeUrl}${this._oauthQueryParams(opts)}`;
   }
 
-  _oauthQueryParams({email, token = null, confirmationRedirectUri = null} = {}) {
+  _oauthQueryParams({
+    email,
+    token = null,
+    confirmationRedirectUri = null
+  } = {}) {
     let url =
       `?client_id=${this.opts.client}` +
       `&redirect_uri=${encodeURIComponent(this.opts.redirect)}` +
@@ -239,7 +244,9 @@ class IdeoSSO {
       url += `&token=${encodeURIComponent(token)}`;
     }
     if (confirmationRedirectUri) {
-      url += `&confirmation_redirect_uri=${encodeURIComponent(confirmationRedirectUri)}`;
+      url += `&confirmation_redirect_uri=${encodeURIComponent(
+        confirmationRedirectUri
+      )}`;
     }
     return url;
   }
@@ -257,13 +264,15 @@ class IdeoSSO {
   }
 
   get _isHttps() {
-    return window.location.protocol === 'https';
+    // Can be 'https' or 'https:'
+    return window.location.protocol.indexOf('https') === 0;
   }
 
   _setCookie(key, value, expiresInHours = 1, domain = null) {
     const opts = {
       expires: this._hoursFromNow(expiresInHours),
-      secure: this._isHttps
+      secure: this._isHttps,
+      sameSite: 'Lax'
     };
     if (domain) {
       opts.domain = domain;
